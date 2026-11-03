@@ -1,0 +1,381 @@
+Q. Write a program for analysis of quick sort by using deterministic and randomized variant.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+import java.util.*;
+
+public class QuickSort {
+
+    static Random rand = new Random();
+
+    // Deterministic Quick Sort
+    static int partition(int a[], int low, int high) {
+
+        int pivot = a[high];
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+
+            if (a[j] < pivot) {
+                i++;
+
+                int temp = a[i];
+                a[i] = a[j];
+                a[j] = temp;
+            }
+        }
+
+        int temp = a[i + 1];
+        a[i + 1] = a[high];
+        a[high] = temp;
+
+        return i + 1;
+    }
+
+    static void quickSort(int a[], int low, int high) {
+
+        if (low < high) {
+
+            int pi = partition(a, low, high);
+
+            quickSort(a, low, pi - 1);
+            quickSort(a, pi + 1, high);
+        }
+    }
+
+    // Randomized Partition
+    static int randomPartition(int a[], int low, int high) {
+
+        int randomIndex = rand.nextInt(high - low + 1) + low;
+
+        int temp = a[randomIndex];
+        a[randomIndex] = a[high];
+        a[high] = temp;
+
+        return partition(a, low, high);
+    }
+
+    // Randomized Quick Sort
+    static void randomizedQuickSort(int a[], int low, int high) {
+
+        if (low < high) {
+
+            int pi = randomPartition(a, low, high);
+
+            randomizedQuickSort(a, low, pi - 1);
+            randomizedQuickSort(a, pi + 1, high);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of elements: ");
+        int n = sc.nextInt();
+
+        int a[] = new int[n];
+
+        System.out.println("Enter array elements:");
+
+        for (int i = 0; i < n; i++) {
+            a[i] = sc.nextInt();
+        }
+
+        int b[] = a.clone();
+
+        // Deterministic Quick Sort
+        quickSort(a, 0, n - 1);
+
+        System.out.println("Deterministic Quick Sort:");
+        System.out.println(Arrays.toString(a));
+
+        // Randomized Quick Sort
+        randomizedQuickSort(b, 0, n - 1);
+
+        System.out.println("Randomized Quick Sort:");
+        System.out.println(Arrays.toString(b));
+
+        sc.close();
+    }
+}
+
+// Example Input/Output
+// Input: Enter number of elements: 5   
+// Enter array elements: 5 2 9 1 5
+// Output:
+// Deterministic Quick Sort: [1, 2, 5, 5, 9]
+// Randomized Quick Sort: [1, 2, 5, 5, 9]
+// Note: The output of Randomized Quick Sort may vary due to the random nature of the algorithm.s 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+C++ Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#include <bits/stdc++.h>
+using namespace std;
+// Deterministic Partition Function
+int deterministicPartition(vector<int> &arr, int low, int high) {
+    int pivot = arr[low];
+    int i = low;
+    int j = high;
+
+    while (i < j) {
+        while (arr[i] <= pivot && i <= high - 1) {
+            i++;
+        }
+        while (arr[j] > pivot && j >= low + 1) {
+            j--;
+        }
+        if (i < j) swap(arr[i], arr[j]);
+    }
+    swap(arr[low], arr[j]);
+    return j;
+}
+
+// Randomized Partition Function
+int randomizedPartition(vector<int> &arr, int low, int high) {
+    int randomIndex = low + rand() % (high - low + 1); // Random index between low and high
+    swap(arr[low], arr[randomIndex]); // Swap the randomly chosen pivot with the first element
+    return deterministicPartition(arr, low, high); // Use deterministic partition with the random pivot
+}
+
+// Quick Sort function with user-selected partition
+void quickSortHelper(vector<int> &arr, int low, int high, bool isRandomized) {
+    if (low < high) {
+        int pIndex;
+        if (isRandomized) {
+            pIndex = randomizedPartition(arr, low, high);
+        } else {
+            pIndex = deterministicPartition(arr, low, high);
+        }
+        quickSortHelper(arr, low, pIndex - 1, isRandomized);
+        quickSortHelper(arr, pIndex + 1, high, isRandomized);
+    }
+}
+
+// Main Quick Sort function
+vector<int> quickSort(vector<int> arr, bool isRandomized) {
+    quickSortHelper(arr, 0, arr.size() - 1, isRandomized);
+    return arr;
+}
+
+// Display function
+void displayArray(const vector<int> &arr) {
+    for (int val : arr) {
+        cout << val << " ";
+    }
+    cout << endl;
+}
+
+// Menu-driven function
+void quickSortMenu() {
+    int choice;
+    vector<int> arr;
+    int n;
+
+    cout << "Enter the size of the array: ";
+    cin >> n;
+    arr.resize(n);
+
+    cout << "Enter the elements of the array:" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+
+    cout << "\nChoose Quick Sort Type:\n";
+    cout << "1. Deterministic Quick Sort\n";
+    cout << "2. Randomized Quick Sort\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    cout << "\nBefore Sorting:\n";
+    displayArray(arr);
+
+    if (choice == 1) {
+        arr = quickSort(arr, false); // Deterministic sort
+        cout << "\nAfter Deterministic Quick Sort:\n";
+    } else if (choice == 2) {
+        arr = quickSort(arr, true); // Randomized sort
+        cout << "\nAfter Randomized Quick Sort:\n";
+    } else {
+        cout << "Invalid choice. Exiting.\n";
+        return;
+    }
+
+    displayArray(arr);
+}
+
+int main() {
+    srand(time(0)); // Seed the random number generator for randomized Quick Sort
+    quickSortMenu();
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 1. Aim
+To implement and analyze Deterministic and Randomized Quick Sort algorithms in Java and compare their time and space complexities.
+
+ 2. Theory
+Quick Sort is a sorting algorithm based on the Divide and Conquer technique. It is used to arrange elements in ascending or descending order.
+
+It works by selecting an element called a Pivot and dividing the array into two parts:
+- Elements smaller than the pivot.
+- Elements greater than the pivot.
+The same process is repeated recursively until the entire array is sorted.
+Divide and Conquer Technique
+
+Quick Sort follows three steps:
+1. Divide: Select a pivot and partition the array into two parts.
+2. Conquer: Recursively sort the left and right subarrays.
+3. Combine: The array becomes sorted after the recursive calls finish.
+
+Types of Quick Sort
+1. Deterministic Quick Sort
+- Selects the pivot using a fixed method.
+- In our program, we select the last element as the pivot.
+- Its performance depends on the input arrangement.
+
+2. Randomized Quick Sort
+- Selects the pivot randomly from the array.
+- Swaps the randomly selected pivot with the last element.
+- Reduces the chances of repeatedly getting an unbalanced partition on particular input arrangements.
+
+Difference Between Deterministic and Randomized Quick Sort
+Deterministic Quick Sort	                          Randomized Quick Sort
+Selects pivot using a fixed rule.	                  Selects pivot randomly.
+Pivot is predictable.	                                  Pivot is unpredictable.
+Can perform poorly on sorted input.	                  Reduces the chance of poor partitions.
+Worst case O(n²).	                                  Worst case O(n²).
+Average case O(n log n).	                          Expected O(n log n).
+
+ 3. Real-Life Example
+1. Library Book Arrangement
+Quick Sort can be used to arrange books according to their names or identification numbers.
+
+2. Online Shopping
+Sorting products according to price, ratings or other values.
+
+3. Student Marks
+Arranging students' marks in ascending or descending order.
+
+ 4. Algorithm
+
+A. Deterministic Quick Sort
+1. Start.
+2. Select the last element as the pivot.
+3. Partition the array around the pivot.
+4. Place smaller elements on the left and larger elements on the right.
+5. Recursively sort the left subarray.
+6. Recursively sort the right subarray.
+7. Stop when the subarray has zero or one element.
+
+B. Randomized Quick Sort
+1. Start.
+2. Select a random element as the pivot.
+3. Swap the selected pivot with the last element.
+4. Partition the array around the pivot.
+5. Recursively sort the left subarray.
+6. Recursively sort the right subarray.
+7. Stop when the subarray has zero or one element.
+
+5. Step-by-Step Explanation
+Suppose the input array is:
+[45, 12, 89, 23, 5, 34]
+
+A. Deterministic Quick Sort
+1. Select the last element 34 as the pivot.
+2. Move elements smaller than 34 to the left.
+3. Place the pivot in its correct position.
+4. Recursively sort the left and right subarrays.
+5. Repeat until the complete array is sorted.
+
+B. Randomized Quick Sort
+1. Randomly select an element as the pivot.
+2. Suppose the randomly selected pivot is 12.
+3. Swap it with the last element.
+4. Partition the array around the pivot.
+5. Recursively sort both subarrays.
+6. Repeat until the array is sorted.
+
+ 6. Time and Space Complexity
+Deterministic Quick Sort
+Case	      Time Complexity
+Best Case	O(n log n)
+Average Case	O(n log n)
+Worst Case	O(n²)
+
+Randomized Quick Sort
+Case	       Time Complexity
+Best Case	O(n log n)
+Expected Case	O(n log n)
+Worst Case	O(n²)
+
+Space Complexity
+Algorithm	              Average Space	Worst Space
+Deterministic Quick Sort        O(log n)	O(n)
+Randomized Quick Sort       	O(log n)        O(n)
+
+Explanation:
+- Best case: Pivot divides the array into nearly equal parts.
+- Average case: Pivot divides the array reasonably well.
+- Worst case: Pivot repeatedly becomes the smallest or largest element.
+- Space: Memory is required for recursive function calls.
+Important: Randomized Quick Sort reduces the probability of getting the worst case, but its theoretical worst-case time complexity is still O(n²).
+
+ 7. Conclusion
+Successfully implemented Deterministic and Randomized Quick Sort algorithms in Java using the Divide and Conquer technique. Both algorithms sort elements in ascending order, while Randomized Quick Sort uses a random pivot to improve expected performance.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Important Viva Questions and Answers
+Basic Questions
+No.	Question	One-Line Answer
+1	What is Quick Sort?	A sorting algorithm based on Divide and Conquer.
+2	Which technique is used?	Divide and Conquer.
+3	What is a pivot?	An element used to divide the array into two parts.
+4	What is partitioning?	Arranging elements around the pivot.
+5	What is Deterministic Quick Sort?	Quick Sort that selects a pivot using a fixed rule.
+6	What is Randomized Quick Sort?	Quick Sort that selects a pivot randomly.
+7	What is recursion?	A function calling itself.
+8	What is Divide and Conquer?	Dividing a problem into smaller subproblems and solving them.
+
+Questions Related to Your Code
+No.	Question	One-Line Answer
+9	Why do we use partition()?	To place the pivot in its correct position.
+10	Why do we use low and high?	To represent the starting and ending indexes.
+11	What is the use of pivot?	It divides smaller and larger elements.
+12	What does a.clone() do?	It creates a copy of the original array.
+13	Why do we use Random?	To generate a random pivot index.
+14	What does rand.nextInt() do?	It generates a random integer within the specified range.
+15	Why do we swap the pivot?	To move the selected random pivot to the last position.
+16	What is the base condition?	When low is greater than or equal to high.
+17	What does Arrays.toString() do?	It converts an array into a printable string.
+18	Why do we use two recursive calls?	To sort the left and right subarrays.
+
+Complexity Questions
+No.	Question	One-Line Answer
+19	Best-case time complexity?	O(n log n).
+20	Average-case time complexity?	O(n log n).
+21	Worst-case time complexity?	O(n²).
+22	Expected time complexity of randomized Quick Sort?	O(n log n).
+23	Average space complexity?	O(log n).
+24	Worst-case space complexity?	O(n).
+25	Why does the worst case occur?	When the pivot repeatedly creates highly unbalanced partitions.
+
+Important Tricky Questions
+No.	Question	One-Line Answer
+26	Which Quick Sort is better?	Randomized Quick Sort generally has better expected performance against unfavorable input arrangements.
+27	Can Quick Sort sort in descending order?	Yes, by changing the comparison condition.
+28	Is Quick Sort stable?	No, standard Quick Sort is not stable.
+29	Is Quick Sort an in-place algorithm?	Yes, standard partition-based Quick Sort sorts within the original array.
+30	What happens if the array has one element?	It is already sorted.
+31	What happens if the array is already sorted?	Deterministic Quick Sort with the last-element pivot can take O(n²).
+32	Does randomized Quick Sort guarantee O(n log n)?	No, it guarantees expected O(n log n), not worst-case O(n log n).
+33	What is the difference between Merge Sort and Quick Sort?	Merge Sort uses merging, while Quick Sort uses partitioning.
+34	What is the main advantage of Quick Sort?	It is efficient in practice and uses little extra memory on average.
+35	What is pivot selection?	Choosing an element around which the array is partitioned.
