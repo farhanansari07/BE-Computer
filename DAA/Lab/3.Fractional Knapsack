@@ -1,0 +1,89 @@
+
+import java.util.*;
+
+class Item {
+    int weight, profit;
+    double ratio;
+
+    Item(int weight, int profit) {
+        this.weight = weight;
+        this.profit = profit;
+        this.ratio = (double) profit / weight;
+    }
+}
+
+public class FractionalKnapsack {
+
+    static void knapsack(Item items[], int capacity) {
+
+        // Sort items by profit/weight ratio
+        Arrays.sort(items, (a, b) ->
+            Double.compare(b.ratio, a.ratio)
+        );
+
+        double totalProfit = 0;
+
+        for (int i = 0; i < items.length; i++) {
+
+            if (capacity == 0)
+                break;
+
+            // Take complete item
+            if (items[i].weight <= capacity) {
+
+                capacity -= items[i].weight;
+                totalProfit += items[i].profit;
+            }
+
+            // Take fractional item
+            else {
+
+                totalProfit += items[i].ratio * capacity;
+                capacity = 0;
+            }
+        }
+
+        System.out.println("Maximum Profit: " + totalProfit);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of items: ");
+        int n = sc.nextInt();
+
+        Item items[] = new Item[n];
+
+        for (int i = 0; i < n; i++) {
+
+            System.out.print("Enter weight of item " + (i+1) + ": ");
+            int weight = sc.nextInt();
+
+            System.out.print("Enter profit of item " + (i+1) + ": ");
+            int profit = sc.nextInt();
+
+            items[i] = new Item(weight, profit);
+        }
+
+        System.out.print("Enter knapsack capacity: ");
+        int capacity = sc.nextInt();
+
+        knapsack(items, capacity);
+
+        sc.close();
+    }
+}
+
+// Example Input/Output
+// Input:
+// Enter number of items: 3
+// Enter weight of item 1: 10
+// Enter profit of item 1: 60
+// Enter weight of item 2: 20
+// Enter profit of item 2: 100
+// Enter weight of item 3: 30
+// Enter profit of item 3: 120
+// Enter knapsack capacity: 50
+// Output:
+// Maximum Profit: 240.0
