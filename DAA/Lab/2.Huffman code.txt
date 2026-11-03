@@ -1,0 +1,440 @@
+Q. Write a program to implement Huffman Encoding using a greedy strategy.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+import java.util.*;
+
+class Node {
+    char ch;
+    int freq;
+    Node left, right;
+
+    Node(char ch, int freq) {
+        this.ch = ch;
+        this.freq = freq;
+        left = right = null;
+    }
+}
+
+public class HuffmanEncoding {
+
+    // Print Huffman Codes
+    static void printCodes(Node root, String code) {
+
+        if (root == null)
+            return;
+
+        // Leaf node
+        if (root.left == null && root.right == null) {
+            System.out.println(root.ch + " : " + code);
+            return;
+        }
+
+        printCodes(root.left, code + "0");
+        printCodes(root.right, code + "1");
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        PriorityQueue<Node> pq = new PriorityQueue<>(
+            (a, b) -> a.freq - b.freq
+        );
+
+        System.out.print("Enter number of characters: ");
+        int n = sc.nextInt();
+
+        // Input characters and frequencies
+        for (int i = 0; i < n; i++) {
+
+            System.out.print("Enter character: ");
+            char ch = sc.next().charAt(0);
+
+            System.out.print("Enter frequency: ");
+            int freq = sc.nextInt();
+
+            pq.add(new Node(ch, freq));
+        }
+
+        // Build Huffman Tree
+        while (pq.size() > 1) {
+
+            Node left = pq.poll();
+            Node right = pq.poll();
+
+            Node parent = new Node(
+                '-', left.freq + right.freq
+            );
+
+            parent.left = left;
+            parent.right = right;
+
+            pq.add(parent);
+        }
+
+        // Print Huffman Codes
+        Node root = pq.poll();
+
+        System.out.println("\nHuffman Codes:");
+        printCodes(root, "");
+
+        sc.close();
+    }
+}
+
+// Example Input/Output
+// Input:Enter number of characters: 6
+
+// Enter character: A
+// Enter frequency: 5
+
+// Enter character: B
+// Enter frequency: 9
+
+// Enter character: C
+// Enter frequency: 12
+
+// Enter character: D
+// Enter frequency: 13
+
+// Enter character: E
+// Enter frequency: 16
+
+// Enter character: F
+// Enter frequency: 45
+
+// Output:
+// Huffman Codes:
+// F : 0
+// C : 100
+// D : 101
+// A : 1100
+// B : 1101
+// E : 111
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+C++ Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#include <bits/stdc++.h>
+using namespace std;
+
+class Node {
+public:
+    char data;
+    long long freq;
+    Node *left, *right;
+    
+    Node(char data, long long freq) {
+        this->data = data;
+        this->freq = freq;
+        left = right = nullptr;
+    }
+};
+
+class Compare {
+public:
+    bool operator()(Node* l, Node* r) {
+        if (l->freq == r->freq)
+            return l->data > r->data;
+        return l->freq > r->freq;
+    }
+};
+
+class HuffmanCoding {
+private:
+    Node* root;
+    map<char, string> codes;
+    
+    void generateCodes(Node* root, string str) {
+        if (!root) return;
+        //leaf
+        if (!root->left && !root->right) {
+            codes[root->data] = str;
+            return;
+        }
+        //upto root
+        generateCodes(root->left, str + "0");
+        generateCodes(root->right, str + "1");
+    }
+    
+public:
+    void buildTree() {
+        priority_queue<Node*, vector<Node*>, Compare> minHeap;
+        int n;
+        cout << "Enter number of characters: ";
+        cin >> n;
+        
+        for(int i = 0; i < n; i++) {
+            char ch;
+            int freq;
+            cout << "Enter character and frequency: ";
+            cin >> ch >> freq;
+            minHeap.push(new Node(ch, freq));
+        }
+        
+        while(minHeap.size() > 1) {
+            Node* left = minHeap.top();
+            minHeap.pop();
+            
+            Node* right = minHeap.top();
+            minHeap.pop();
+            
+            Node* parent = new Node('$', left->freq + right->freq);
+            parent->left = left;
+            parent->right = right;
+            
+            minHeap.push(parent);
+        }
+        
+        root = minHeap.top();
+        codes.clear();
+        generateCodes(root, "");
+    }
+    
+    void displayCodes() {
+        cout << "\nHuffman Codes:" << endl;
+        for(auto pair : codes) {
+            cout << pair.first << " : " << pair.second << endl;
+        }
+    }
+    
+    string encode(string text) {
+        string encoded = "";
+        for(char c : text) {
+            if(codes.find(c) != codes.end()) {
+                encoded += codes[c];
+            }
+        }
+        return encoded;
+    }
+    
+    string decode(string encoded) {
+        string decoded = "";
+        Node* current = root;
+        
+        for(char bit : encoded) {
+            if(bit == '0') 
+                current = current->left;
+            else 
+                current = current->right;
+                
+            if(!current->left && !current->right) {
+                decoded += current->data;
+                current = root;
+            }
+        }
+        return decoded;
+    }
+};
+
+int main() {
+    HuffmanCoding huffman;
+    int choice;
+    
+    while(true) {
+        cout << "\nHuffman Coding Menu\n";
+        cout << "1. Build Huffman Tree\n";
+        cout << "2. Display Codes\n";
+        cout << "3. Encode Text\n";
+        cout << "4. Decode Text\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+        
+        switch(choice) {
+            case 1: {
+                huffman.buildTree();
+                break;
+            }
+            case 2: {
+                huffman.displayCodes();
+                break;
+            }
+            case 3: {
+                string text;
+                cout << "Enter text to encode: ";
+                cin >> text;
+                cout << "Encoded: " << huffman.encode(text) << endl;
+                break;
+            }
+            case 4: {
+                string encoded;
+                cout << "Enter binary string to decode: ";
+                cin >> encoded;
+                cout << "Decoded: " << huffman.decode(encoded) << endl;
+                break;
+            }
+            case 5:
+                return 0;
+            default:
+                cout << "Invalid choice!\n";
+        }
+    }
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To write a Java program to implement Huffman Encoding using a Greedy Strategy for data compression and analyze its time and space complexity.
+
+2. Theory
+Huffman Encoding is a lossless data compression technique used to reduce the size of data without losing any information.
+
+It assigns variable-length binary codes to characters based on their frequency of occurrence.
+- Characters with higher frequency get shorter binary codes.
+- Characters with lower frequency get longer binary codes.
+- No character's code is the prefix of another character's code. This property is called the Prefix Property.
+Huffman Encoding uses a Greedy Algorithm because it repeatedly selects the two characters or nodes having the lowest frequencies and combines them into a new node.
+
+Important terms
+1. Frequency: Number of times a character appears in the input.
+2. Greedy Strategy: Choosing the locally optimal option at each step.
+3. Binary Code: A sequence of 0s and 1s assigned to a character.
+4. Prefix Property: No code is the starting part of another code.
+5. Lossless Compression: Compressing data without losing the original information.
+6. Priority Queue: A data structure that allows us to efficiently select the node with the smallest frequency.
+3. Real-Life Examples
+
+
+1. ZIP File Compression
+
+ZIP compression uses techniques including Huffman coding to reduce file sizes, making files easier to store and share.
+
+2. JPEG Images
+
+Huffman coding is used in JPEG compression to encode image data efficiently.
+
+3. Data Storage and Transmission
+
+It helps reduce the number of bits required to represent data, saving storage space and transmission bandwidth.
+
+
+
+4. Working of Huffman Encoding
+Suppose we have the following characters and frequencies:
+Character	Frequency
+A	5
+B	9
+C	12
+D	13
+E	16
+F	45
+
+5. Algorithm
+1. Start.
+2. Read the number of characters.
+3. Read each character and its frequency.
+4. Insert all characters into a Priority Queue.
+5. Extract the two nodes having the minimum frequencies.
+6. Create a new node by combining their frequencies.
+7. Make the first node the left child and the second node the right child.
+8. Insert the new node back into the Priority Queue.
+9. Repeat until only one node remains.
+10. Traverse the Huffman Tree:
+    - Assign 0 to the left branch.
+    - Assign 1 to the right branch.
+11. Print the Huffman codes.
+12. Stop.
+
+9. Time and Space Complexity
+Operation	Complexity
+Creating Priority Queue	O(n)
+Removing minimum nodes	O(log n) each
+Building Huffman Tree	O(n log n)
+Printing Huffman Codes	O(n)
+Overall Time	O(n log n)
+Space Complexity	O(n)
+
+Explanation:
+- Time Complexity – O(n log n): We combine nodes n-1 times, and each removal and insertion in the Priority Queue takes O(log n) time.
+- Space Complexity – O(n): We store n leaf nodes and n-1 internal nodes in the Huffman Tree.
+
+10. Conclusion
+Successfully implemented Huffman Encoding using the Greedy Strategy in Java. The program generates variable-length binary codes based on character frequencies and demonstrates lossless data compression.
+
+11. Real-Life Example with Simple Explanation
+Suppose you are sending a message:
+AAAAABBBCC
+
+Frequency of each character:
+Character	Frequency
+A	5
+B	3
+C	2
+
+Instead of giving every character the same number of bits, Huffman Encoding gives shorter codes to frequently occurring characters.
+
+For example, one possible Huffman assignment is:
+Character	Huffman Code
+A	0
+B	10
+C	11
+
+Original message:
+AAAAABBBCC
+
+Encoded message:
+0000010101011111
+
+Thus, fewer bits are required than using fixed-length 2-bit codes for all three characters.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Basic Questions
+No.	Question	One-line Answer
+1	What is Huffman Encoding?	It is a lossless data compression technique.
+2	Who developed Huffman Coding?	David A. Huffman.
+3	What is a Greedy Algorithm?	It selects the best available option at each step.
+4	Why is Huffman Coding greedy?	It always combines the two minimum-frequency nodes.
+5	What is data compression?	Reducing the size of data.
+6	What is lossless compression?	Compression without losing original data.
+7	What is frequency?	Number of times a character appears.
+8	What is a Huffman Tree?	A binary tree used to generate Huffman codes.
+
+Questions Related to Your Code
+No.	Question	One-line Answer
+9	What is a Priority Queue?	A data structure that removes elements according to priority.
+10	Why do we use Priority Queue?	To efficiently select the two minimum-frequency nodes.
+11	What does poll() do?	It removes and returns the smallest-priority element.
+12	What does add() do?	It inserts an element into the Priority Queue.
+13	What is a Node?	It stores a character, frequency and child references.
+14	What is a leaf node?	A node that has no children.
+15	Why do we use left and right children?	To build the binary Huffman Tree.
+16	Why do we assign 0 to the left?	To represent the left branch of the tree.
+17	Why do we assign 1 to the right?	To represent the right branch of the tree.
+18	What is the use of recursion here?	To traverse the Huffman Tree and print codes.
+19	What is the use of charAt(0)?	It extracts the first character from a string.
+20	Why do we use static?	To call a method without creating an object.
+
+Complexity Questions
+No.	Question	One-line Answer
+21	What is the time complexity of Huffman Coding?	O(n log n).
+22	What is its space complexity?	O(n).
+23	Why do we use O(n log n)?	Because Priority Queue insertion and deletion take O(log n).
+24	What is the complexity of Priority Queue insertion?	O(log n).
+25	What is the complexity of Priority Queue deletion?	O(log n).
+26	What is the complexity of searching in a normal Priority Queue?	O(n).
+
+Important Tricky Questions
+No.	Question	One-line Answer
+27	What is Prefix Property?	No code should be the prefix of another code.
+28	Why is Prefix Property important?	It allows unambiguous decoding.
+29	Which character gets the shortest code?	The character with the highest frequency generally gets the shortest code.
+30	Which character gets the longest code?	A character with a low frequency generally gets a longer code.
+31	Is Huffman Coding fixed-length or variable-length?	Variable-length encoding.
+32	What happens if two characters have equal frequency?	Either can be selected first; tie-breaking may change the codes.
+33	Can Huffman Coding be used for text compression?	Yes, it is commonly used for text and data compression.
+34	What is the main advantage of Huffman Coding?	It reduces the number of bits required to store data.
+35	What is the main limitation of Huffman Coding?	It requires frequency information and code-tree information for decoding.
+36	Where is Huffman Coding used?	JPEG, ZIP and other compression systems.
+37	What is an internal node?	A node that has at least one child.
+38	How many nodes are in a full Huffman Tree with n characters?	2n - 1 nodes.
+39	Can Huffman Coding encode all characters with the same frequency?	Yes, but the resulting code lengths may be similar.
+40	What is the difference between Huffman and fixed-length encoding?	Huffman uses variable-length codes, while fixed-length uses equal-length codes.
+
