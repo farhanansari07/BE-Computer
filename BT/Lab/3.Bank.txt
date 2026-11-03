@@ -1,0 +1,226 @@
+Q. Write a smart contract on a test network, for Bank account of a customer for following 
+operations: 
+• Deposit money  
+• Withdraw Money 
+• Show balance
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Code
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+contract Bank {
+    address private accOwner;
+    uint256 balance = 0;
+
+    constructor() {
+        accOwner = msg.sender;
+    }
+
+    function Deposit() public payable {
+        require(accOwner == msg.sender, "You are not an account owner!");
+        require(msg.value > 0, "Amount should be greater than 0.");
+
+        balance += msg.value;
+    }
+
+    function Withdraw(uint256 amount) public {
+    require(accOwner == msg.sender, "You are not an account owner!");
+    require(amount > 0, "Amount must be greater than 0.");
+    require(amount <= balance, "Insufficient balance!");
+
+    balance -= amount;
+
+    (bool success, ) = payable(msg.sender).call{value: amount}("");
+    require(success, "ETH transfer failed!");
+    }
+
+    function showBalance() public view returns (uint256) {
+        require(accOwner == msg.sender, "You are not an account owner!");
+        return balance;
+    }
+}
+
+
+
+
+
+//This code gives, input boxes to all
+
+ // SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+contract Bank {
+    address private accOwner;
+    uint256 balance = 0;
+
+    constructor() {
+        accOwner = msg.sender;
+    }
+
+    function Deposit(uint256 amount) public payable {
+    require(accOwner == msg.sender, "You are not an account owner!");
+    require(amount > 0, "Amount must be greater than 0.");
+    require(msg.value == amount, "Amount mismatch!");
+
+    balance += msg.value;
+    }
+
+    function Withdraw(uint256 amount) public {
+    require(accOwner == msg.sender, "You are not an account owner!");
+    require(amount > 0, "Amount must be greater than 0.");
+    require(amount <= balance, "Insufficient balance!");
+
+    balance -= amount;
+
+    (bool success, ) = payable(msg.sender).call{value: amount}("");
+    require(success, "ETH transfer failed!");
+    }
+
+    function showBalance() public view returns (uint256) {
+        require(accOwner == msg.sender, "You are not an account owner!");
+        return balance;
+    }
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To write and deploy a smart contract on an Ethereum test network using Solidity to perform banking operations such as depositing money, withdrawing money, and checking the account balance.
+
+2. Theory
+A Smart Contract is a self-executing program stored on a blockchain that automatically executes predefined instructions when specified conditions are satisfied.
+Solidity is a high-level programming language used to develop smart contracts on the Ethereum blockchain.
+In this practical, a smart contract named Bank is created to perform basic banking operations.
+
+The contract contains the following operations:
+1. Deposit Money: Allows the account owner to deposit Ether into the smart contract. The deposited amount is added to the account balance.
+2. Withdraw Money: Allows the account owner to withdraw Ether from the contract, provided sufficient balance is available.
+3. Show Balance: Displays the current balance of the account owner.
+The contract uses msg.sender to identify the person calling the function and msg.value to identify the amount of Ether sent with a transaction.
+
+The require() statement is used to validate conditions and prevent unauthorized access or invalid transactions.
+
+The smart contract stores the owner's address and balance on the blockchain, providing transparency, security and reliability.
+
+3. Algorithm
+Step 1: Start.
+
+Step 2: Declare a smart contract named Bank.
+
+Step 3: Declare variables to store the account owner's address and account balance.
+
+Step 4: Initialize the account owner's address using msg.sender in the constructor.
+
+Step 5: Create a Deposit() function:
+- Check whether the caller is the account owner.
+- Check whether the deposited amount is greater than zero.
+- Add the deposited amount to the account balance.
+Step 6: Create a Withdraw() function:
+- Check whether the caller is the account owner.
+- Check whether the withdrawal amount is greater than zero.
+- Check whether sufficient balance is available.
+- Deduct the amount from the balance.
+- Transfer Ether to the account owner.
+Step 7: Create a showBalance() function:
+- Verify the account owner's address.
+- Return the current account balance.
+Step 8: Deploy the smart contract on an Ethereum test network.
+
+Step 9: Perform deposit, withdrawal and balance-checking operations.
+
+Step 10: Stop.
+
+
+Overall time complexity: O(1) for each operation.
+
+Note: This is the algorithmic time complexity. Actual blockchain transaction cost is measured in gas and depends on the operations performed.
+ 5. Real-Life Applications
+1. Digital Banking: Automates deposits and withdrawals using smart contracts.
+2. Decentralized Finance (DeFi): Used in decentralized financial applications.
+3. Digital Wallets: Manages cryptocurrency deposits and withdrawals.
+4. Payment Systems: Enables automated and transparent digital payments.
+5. Escrow Services: Holds funds securely until predefined conditions are fulfilled.
+6. Automated Financial Services: Reduces the need for intermediaries in financial transactions.
+
+6. Conclusion
+Thus, we successfully created a Bank smart contract using Solidity and deployed it on an Ethereum test network. The contract performs deposit, withdrawal and balance-checking operations with proper access control and validation. It demonstrates how blockchain technology can be used to develop secure, transparent and decentralized financial applications.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viva Questions and Answers
+Here are the most likely questions an examiner can ask, with simple one-line answers.
+A. Basic Blockchain Questions
+Question	One-line answer
+1. What is blockchain?	Blockchain is a distributed digital ledger that stores records in linked blocks.
+2. What is Ethereum?	Ethereum is a blockchain platform that supports smart contracts and decentralized applications.
+3. What is a smart contract?	A smart contract is a self-executing program deployed on a blockchain.
+4. What is Solidity?	Solidity is a programming language used to write Ethereum smart contracts.
+5. What is a DApp?	A DApp is a decentralized application that operates using blockchain technology.
+6. What is a test network?	A test network is a blockchain environment used to test smart contracts without using real money.
+7. What is Mainnet?	Mainnet is the actual live blockchain network where real transactions take place.
+8. What is Ether?	Ether (ETH) is the native cryptocurrency of the Ethereum blockchain.
+9. What is gas?	Gas is the unit used to measure computational work on Ethereum.
+10. What is a transaction?	A transaction is an operation submitted to the blockchain that can change its state.
+
+B. Solidity Questions
+Question	One-line answer
+11. What is a contract in Solidity?	A contract is a collection of code and data stored at an Ethereum address.
+12. What is pragma?	Pragma specifies the compiler version or compiler-related instructions.
+13. What is uint256?	It is an unsigned 256-bit integer data type.
+14. What is an address?	It is a 20-byte data type used to store an Ethereum account address.
+15. What is a constructor?	A constructor executes only once when the contract is deployed.
+16. What is msg.sender?	It represents the address that called the current function.
+17. What is msg.value?	It represents the amount of Ether sent with the current transaction in Wei.
+18. What is payable?	Payable allows a function or address to receive Ether.
+19. What is require()?	Require checks conditions and reverts execution if a condition is false.
+20. What is public?	Public allows a function or variable to be accessed externally and internally.
+21. What is private?	Private restricts access to the contract in which it is declared.
+22. What is view?	View allows reading state variables without modifying them.
+23. What is returns?	Returns specifies the output value of a function.
+24. What is a modifier?	A modifier is used to add reusable conditions to functions.
+25. What is a mapping?	Mapping stores key-value pairs in Solidity.
+26. What is an event?	An event emits information that can be recorded in transaction logs.
+
+C. Questions Based on Your Bank Contract
+Question	One-line answer
+27. What is the name of your contract?	The name of my contract is Bank.
+28. What is accOwner?	It stores the address of the bank account owner.
+29. Why is accOwner private?	To restrict direct access to the variable through Solidity's contract interface.
+30. What is the initial balance?	The initial balance is zero.
+31. Why did you use a constructor?	To assign the deployer's address as the account owner.
+32. Why did you use msg.sender?	To identify and authenticate the calling account.
+33. Why is Deposit() payable?	Because it needs to receive Ether.
+34. Why is Withdraw() not payable?	Because it sends Ether rather than receiving Ether from the caller.
+35. Why do you check msg.value greater than zero?	To prevent zero-value deposits.
+36. Why do you check amount greater than zero?	To prevent zero-value withdrawals.
+37. What happens if the balance is insufficient?	The transaction reverts with an insufficient balance error.
+38. Why do you subtract before transferring Ether?	To follow the checks-effects-interactions security pattern.
+39. What is the purpose of bool success?	It indicates whether the Ether transfer succeeded.
+40. What happens if the transfer fails?	The require statement reverts the transaction, including the balance deduction.
+41. Why did you use call()?	It transfers Ether and returns a success status.
+42. Why is showBalance() a view function?	Because it only reads the balance without modifying it.
+43. Can another person withdraw money?	No, because the contract checks whether msg.sender matches accOwner.
+44. Can another person deposit money?	No, because the deposit function also checks the account owner.
+45. Where is the balance stored?	It is stored in the contract's state variable on the blockchain.
+
+D. Important Advanced Viva Questions
+These questions can help you handle follow-up questions from the examiner.
+Question	One-line answer
+46. What is Wei?	Wei is the smallest unit of Ether.
+47. How many Wei are in 1 ETH?	1 ETH = 10¹⁸ Wei.
+48. What is Remix IDE?	Remix is an online IDE used to write, compile, deploy and test Solidity contracts.
+49. What is MetaMask?	MetaMask is a cryptocurrency wallet used to interact with Ethereum applications.
+50. What is ABI?	ABI (Application Binary Interface) defines how applications interact with a smart contract.
+51. What is bytecode?	Bytecode is the compiled machine-readable code deployed on the Ethereum Virtual Machine.
+52. What is EVM?	EVM is the Ethereum Virtual Machine that executes smart contract code.
+53. What is reentrancy?	Reentrancy is an attack where an external contract repeatedly calls a vulnerable function before execution finishes.
+54. How does your contract prevent reentrancy?	It updates the balance before making the external Ether transfer, following checks-effects-interactions.
+55. What is gas limit?	It is the maximum amount of gas allowed for a transaction.
+56. What happens if a transaction reverts?	State changes are rolled back, but the gas used is generally charged.
+57. What is immutability?	Immutability means deployed blockchain records cannot be easily altered.
+58. What is decentralization?	Decentralization means control and data are distributed across multiple network participants.
+59. What is the difference between call and transfer?	Call forwards configurable gas and returns a success value, while transfer uses a fixed 2300-gas stipend.
+60. Can we change a smart contract after deployment?	Generally, deployed contract code cannot be directly modified; an upgradeable proxy pattern can provide upgrades.

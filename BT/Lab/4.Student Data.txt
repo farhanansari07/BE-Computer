@@ -1,0 +1,220 @@
+Q. Write a program in solidity to create Student data. Use the following constructs: 
+• Structures 
+• Arrays 
+• Fallback 
+Deploy this as smart contract on Ethereum and Observe the transaction fee and Gas values.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Code
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+contract StudentData{
+    struct Student{
+        string name;
+        uint rollno;
+    }
+
+    Student[] public studentArr;
+
+    function addStudent(string memory name,uint rollno) public{
+        for(uint i=0;i<studentArr.length;i++){
+            if(studentArr[i].rollno==rollno){
+                revert("Student with roll no already exists!");
+            }
+        }
+        studentArr.push(Student(name,rollno));
+    }
+
+    function displayAllStudents() public view returns(Student[] memory){
+        return studentArr;
+    }
+
+    function getStudentByIndex(uint index) public view returns(Student memory){
+        require(index<studentArr.length || index > studentArr.length,"Index out of bound");
+        return studentArr[index];
+    }
+
+    function getLengthOfStudents() public view returns(uint){
+        return studentArr.length;
+    }
+
+
+}
+
+
+// correct getStudentByIndex function condition
+//require(index < studentArr.length, "Index out of bounds");
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 1. Aim
+To write and deploy a smart contract using Solidity to store and manage student information using Structures, Arrays and Fallback functions on the Ethereum blockchain, and observe the transaction fee and gas values.
+
+ 2. Theory
+Solidity is a high-level programming language used to develop smart contracts on the Ethereum blockchain.
+
+In this practical, a smart contract named StudentData is created to store and manage student information using the following constructs:
+1. Structure (struct):
+A structure is a user-defined data type that groups multiple variables of different data types under one name. Here, the Student structure contains the student's name and roll number.
+2. Array:
+An array is a collection of elements of the same data type. Here, a dynamic array named studentArr stores multiple student records.
+3. Fallback Function:
+A fallback function is a special unnamed function that executes when a contract receives a call with unmatched function data or, depending on its declaration, receives Ether without matching a receive function. It is declared using the fallback keyword.
+4. Gas and Transaction Fee:
+Gas represents the computational effort required to execute operations on Ethereum. Transaction fees are calculated based on gas used and the effective gas price.
+The contract provides functions to add student details, display all students, retrieve a student by index and find the total number of students.
+
+ 3. Algorithm
+1. Start.
+2. Declare a smart contract named StudentData.
+3. Define a structure named Student containing:
+   - Student name of type string.
+   - Roll number of type uint.
+4. Declare a dynamic array studentArr to store student records.
+5. Create the addStudent() function:
+   - Accept student name and roll number.
+   - Check whether the roll number already exists.
+   - If it exists, revert the transaction.
+   - Otherwise, add the student record to the array.
+6. Create the displayAllStudents() function to return all student records.
+7. Create the getStudentByIndex() function to retrieve student details using an index.
+8. Create the getLengthOfStudents() function to return the total number of students.
+9. Deploy the contract on the Ethereum test network.
+10. Execute the functions and observe the gas used and transaction fees.
+11. Stop.
+
+Real-Life Applications
+1. Educational Institutions: Store student names and roll numbers on blockchain.
+2. Digital Student Records: Maintain tamper-resistant academic records.
+3. Certificate Verification: Verify student identity and academic credentials.
+4. University Management: Maintain student registration information.
+5. Examination Systems: Store student registration and examination details.
+6. Decentralized Identity: Associate student information with blockchain addresses.
+
+ 7. Conclusion
+Thus, we successfully created a Student Data smart contract using Solidity. We used Structures to define student information, Arrays to store multiple student records, and a Fallback function to handle unmatched calls. We deployed the contract on an Ethereum test network and observed the gas consumption and transaction fees for different operations.
+
+ 8. Gas and Transaction Fee (Very Important)
+The examiner may specifically ask you about this because it is mentioned in the practical statement.
+
+What is Gas?
+Gas is the unit that measures the computational work required to execute operations on the Ethereum blockchain.
+
+What is Transaction Fee?
+Transaction fee is the amount of Ether paid to execute a transaction on Ethereum.
+
+Formula:
+Transaction Fee=Gas Used * Effective Gas Price
+
+For example, suppose:
+- Gas used = 50,000
+- Gas price = 20 Gwei
+Then:
+50,000 * 20=1,000,000 Gwei =  0.001 ETH
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viva Questions and Answers
+Here are the most likely questions based on your code and the practical syllabus.
+A. Basic Solidity Questions
+No.	Question	One-line answer
+1	What is Solidity?	Solidity is a programming language used to write smart contracts.
+2	What is a smart contract?	It is a self-executing program deployed on a blockchain.
+3	What is Ethereum?	Ethereum is a blockchain platform that supports smart contracts.
+4	What is Remix IDE?	Remix is an online IDE used to write, compile and deploy Solidity contracts.
+5	What is EVM?	EVM stands for Ethereum Virtual Machine, which executes smart contracts.
+6	What is a test network?	It is a blockchain network used for testing without spending real cryptocurrency.
+7	What is a contract?	A contract is a collection of functions and data stored on the blockchain.
+
+B. Structure Questions
+No.	Question	One-line answer
+8	What is a structure?	A structure is a user-defined data type that groups different variables together.
+9	Which keyword is used to declare a structure?	The struct keyword.
+10	Why did you use a structure?	To group student name and roll number into one record.
+11	What is the name of your structure?	Student.
+12	Which variables are present in your structure?	Name of type string and rollno of type uint.
+13	Can a structure contain different data types?	Yes, it can contain different data types.
+14	Can a structure contain an array?	Yes, a structure can contain arrays and other supported data types.
+15	What is a user-defined data type?	A data type created by the programmer according to requirements.
+
+C. Array Questions
+No.	Question	One-line answer
+16	What is an array?	An array is a collection of elements of the same data type.
+17	What type of array did you use?	A dynamic array.
+18	What is a dynamic array?	A dynamic array can grow or shrink in size during execution.
+19	What is the name of your array?	studentArr.
+20	How do you add an element to an array?	By using the push() function.
+21	What is the use of length?	It returns the total number of elements in an array.
+22	What is the first index of an array?	Zero.
+23	How do you access an array element?	By using its index.
+24	What happens if an invalid index is accessed?	The transaction or call reverts due to an out-of-bounds error.
+25	What is the difference between fixed and dynamic arrays?	Fixed arrays have predefined sizes, whereas dynamic arrays can change size.
+
+D. Fallback Function Questions
+No.	Question	One-line answer
+26	What is a fallback function?	It is a special function executed when a call does not match any existing function.
+27	How is fallback declared?	Using fallback() external syntax.
+28	Is fallback a named function?	No, it is an unnamed special function.
+29	Can fallback receive Ether?	Yes, if it is declared payable.
+30	When does fallback execute?	When unmatched function data is sent or when no receive function handles an empty call.
+31	What is the difference between fallback and receive?	Receive handles empty calldata with Ether, whereas fallback handles unmatched calls.
+32	Is fallback mandatory in every contract?	No, it is optional.
+33	Can fallback be private?	No, fallback must be external.
+34	Can we overload fallback?	No, a contract can have only one fallback function.
+
+E. Questions Based on Your Program
+No.	Question	One-line answer
+35	What is the name of your contract?	StudentData.
+36	What is the purpose of addStudent()?	It adds a new student record to the array.
+37	What is the purpose of revert()?	It stops execution and reverses state changes when an error occurs.
+38	Why did you use a for loop?	To check whether the roll number already exists.
+39	Why are duplicate roll numbers not allowed?	To maintain unique student identification.
+40	What is the purpose of displayAllStudents()?	It returns all stored student records.
+41	Why did you use memory?	Memory stores temporary data during function execution.
+42	What is getStudentByIndex()?	It retrieves student details using the array index.
+43	What is getLengthOfStudents()?	It returns the total number of students.
+44	Why did you use view?	Because the function reads data without modifying blockchain state.
+45	Why did you use public for the array?	It allows external access through an automatically generated getter.
+46	What happens if a duplicate roll number is entered?	The transaction reverts with an error message.
+47	Can anyone add student details?	Yes, in the given contract there is no owner restriction.
+48	Where is student data stored?	It is stored in the contract's state variable on the blockchain.
+
+F. Gas and Transaction Questions
+No.	Question	One-line answer
+49	What is gas?	Gas measures computational work on Ethereum.
+50	What is gas limit?	It is the maximum gas allowed for a transaction.
+51	What is gas used?	It is the actual amount of gas consumed during execution.
+52	What is Gwei?	Gwei is a denomination of Ether commonly used for gas prices.
+53	How many Gwei equal 1 ETH?	1 ETH = 1 billion Gwei.
+54	What is transaction fee?	It is the fee paid to execute a blockchain transaction.
+55	What is the transaction fee formula?	Gas used multiplied by effective gas price.
+56	Which function consumes gas?	State-changing functions such as addStudent() consume gas.
+57	Does a view function require gas?	It consumes computational resources, but a normal off-chain call does not require a transaction fee.
+58	Why does deployment consume gas?	Because contract creation and storage require computational resources.
+59	Why does adding a student consume gas?	Because it modifies blockchain storage.
+60	Does gas consumption remain constant?	No, it depends on execution and input data.
+
+
+10. Important Differences for Viva
+These are common examiner follow-up questions.
+Structure vs Array
+Structure	Array
+Groups different data types.	Stores multiple elements of the same type.
+Declared using struct.	Declared using array syntax.
+Example: Student.	Example: studentArr.
+
+Fallback vs Receive
+Fallback	Receive
+Handles unmatched function calls.	Handles empty calldata with Ether.
+Declared using fallback().	Declared using receive().
+Can be payable.	Must be payable.
+Executes when no receive function handles an empty call.	Executes when Ether is sent with empty calldata.
+
+Memory vs Storage
+Memory	Storage
+Temporary data location.	Permanent contract data location.
+Exists during function execution.	Persists on the blockchain.
+Generally cheaper than storage.	Generally more expensive to modify.
