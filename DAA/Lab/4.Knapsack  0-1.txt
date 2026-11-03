@@ -1,0 +1,336 @@
+Q.  Write a program to solve a 0-1 Knapsack problem using dynamic programming or branch and 
+bound strategy. 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+import java.util.Scanner;
+
+public class Knapsack01 {
+
+    static int knapsack(int wt[], int profit[], int W, int n) {
+
+        int dp[][] = new int[n + 1][W + 1];
+
+        // Dynamic Programming
+        for (int i = 0; i <= n; i++) {
+
+            for (int w = 0; w <= W; w++) {
+
+                if (i == 0 || w == 0) {
+                    dp[i][w] = 0;
+                }
+
+                else if (wt[i - 1] <= w) {
+
+                    dp[i][w] = Math.max(
+                        profit[i - 1] + dp[i - 1][w - wt[i - 1]],
+                        dp[i - 1][w]
+                    );
+                }
+
+                else {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+
+        return dp[n][W];
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of items: ");
+        int n = sc.nextInt();
+
+        int wt[] = new int[n];
+        int profit[] = new int[n];
+
+        for (int i = 0; i < n; i++) {
+
+            System.out.print("Enter weight of item " + (i + 1) + ": ");
+            wt[i] = sc.nextInt();
+
+            System.out.print("Enter profit of item " + (i + 1) + ": ");
+            profit[i] = sc.nextInt();
+        }
+
+        System.out.print("Enter knapsack capacity: ");
+        int W = sc.nextInt();
+
+        int result = knapsack(wt, profit, W, n);
+
+        System.out.println("Maximum Profit: " + result);
+
+        sc.close();
+    }
+}
+
+// Example Input/Output
+// Input:
+// Enter number of items: 3
+// Enter weight of item 1: 10
+// Enter profit of item 1: 60
+// Enter weight of item 2: 20
+// Enter profit of item 2: 100
+// Enter weight of item 3: 30
+// Enter profit of item 3: 120
+// Enter knapsack capacity: 50
+// Output:
+// Maximum Profit: 220  
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+C++ Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#include<bits/stdc++.h>
+using namespace std;
+
+
+void printTable(vector<vector<int>>&dp,int n,int W){
+    for(int i=0;i<=n;i++){
+        for(int w=0;w<=W;w++){
+            cout<<setw(3)<<dp[i][w];
+        }
+        cout<<endl;
+    }
+}
+
+int knapsack(vector<int>&weights,vector<int>&profits,int W,vector<int>&selectedItems){
+    int n=weights.size();
+
+    vector<vector<int>>dp(n+1,vector<int>(W+1,0));
+
+    //fill values in the table 
+    
+    for(int i=1;i<=n;i++){
+        for(int w=1;w<=W;w++){
+            //
+            if(weights[i-1]<=w){
+                dp[i][w]=max(dp[i-1][w],profits[i-1]+dp[i-1][w-weights[i-1]]);
+            }
+            else{
+                dp[i][w]=dp[i-1][w];
+            }
+        }
+    }
+
+    printTable(dp,n,W);
+    int maxProfit=dp[n][W];
+    int w=W;
+    for(int i=n;i>0 && maxProfit>0;i--){
+        if(maxProfit!=dp[i-1][w]){
+            selectedItems.push_back(i);
+            maxProfit-=profits[i-1];
+            w-=weights[i-1];
+        }
+    }
+
+
+    return dp[n][W];
+}
+
+int main(){
+    while(true){
+        cout<<"Enter 1 to perform 0/1 knapsack problem"<<endl;
+        cout<<"Enter 2 to exit"<<endl;
+        int op;
+        cout<<"Enter option"<<endl;
+        cin>>op;
+        if(op==1){
+            int n;
+            cout<<"Enter the number of items"<<endl;
+            cin>>n;
+            //vector weights profits
+            vector<int>weights(n),profits(n);
+            for(int i=0;i<n;i++){
+                cout<<"Enter the weight of "<<i+1<<" item: "<<endl;
+                cin>>weights[i];
+                cout<<"Enter the profit of "<<i+1<<" item: "<<endl;
+                cin>>profits[i];
+            }
+
+            //max weight of knapsack? 
+            int W;
+            cout<<"Enter the maxWeight of knapsack"<<endl;
+            cin>>W;
+
+            vector<int>selectedItems;
+            //maxProfit
+
+            int res=knapsack(weights,profits,W,selectedItems);
+
+            cout<<"Max Profit: "<<res<<endl;
+
+            cout<<"Items selected (1-based index)"<<endl;
+            for(auto item:selectedItems){
+                cout<<item<<" ";
+            }
+            
+
+        }
+
+        else{
+            cout<<"invalid option"<<endl;
+        }
+    }
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 1. Aim
+To write a Java program to solve the 0/1 Knapsack Problem using Dynamic Programming and analyze its time and space complexity.
+
+ 2. Theory
+The 0/1 Knapsack Problem is an optimization problem in which we are given a knapsack with a fixed capacity and a set of items, each having a weight and a profit.
+
+The objective is to select items such that the total profit is maximum without exceeding the capacity of the knapsack.
+
+It is called the 0/1 Knapsack Problem because:
+- 1: Select the complete item.
+- 0: Do not select the item.
+We cannot divide an item into fractions.
+Dynamic Programming
+Dynamic Programming is a problem-solving technique that breaks a problem into smaller subproblems and stores their results to avoid repeated calculations.
+
+In the 0/1 Knapsack Problem, we use a two-dimensional array dp[][] to store the maximum profit for different items and capacities.
+
+Formula:
+If the weight of the current item is less than or equal to the available capacity:
+dp[i][w] = max(dp[i-1][w],profit[i-1]+dp[i-1][w-weight[i-1]])
+Otherwise:
+dp[i][w] = dp[i-1][w]
+
+Where:
+- i = Number of items considered.
+- w = Current knapsack capacity.
+- dp[i][w] = Maximum profit possible.
+Base Conditions:
+- If there are no items, profit = 0.
+- If capacity is 0, profit = 0.
+
+Real-Life Examples
+
+1. Packing a Suitcase
+You have limited luggage capacity and several items. You must choose complete items to maximize their total value.
+
+2. Cargo Loading
+A truck has limited weight capacity. The company selects complete packages to maximize their total value.
+
+3. Project Selection
+A company has a limited budget and must select complete projects to maximize expected profit.
+
+
+
+ 4. Algorithm
+1. Start.
+2. Read the number of items.
+3. Read the weight and profit of each item.
+4. Read the knapsack capacity.
+5. Create a 2D DP array of size (n+1) × (capacity+1).
+6. Initialize the first row and first column with 0.
+7. Check each item:
+   - If its weight is less than or equal to capacity, choose the maximum of including or excluding it.
+   - Otherwise, exclude the item.
+8. Store the maximum profit in the DP table.
+9. Print the maximum profit.
+10. Stop.
+
+Step-by-Step Explanation
+Given:
+Item	Weight	Profit
+1	10	60
+2	20	100
+3	30	120
+
+Knapsack capacity = 50.
+
+We have two choices for every item:
+- Include the item.
+- Exclude the item.
+Step 1: Select Item 1 (weight 10, profit 60).
+
+Step 2: Select Item 2 (weight 20, profit 100).
+
+Total weight = 30 and total profit = 160.
+
+Step 3: Consider Item 3 (weight 30, profit 120).
+
+We cannot select all three because total weight would be 60, which exceeds capacity 50.
+
+The best combination is Item 2 + Item 3.
+Total\ Weight = 20+30=50
+Maximum\ Profit = 100+120=220
+
+Time and Space Complexity
+Operation	Complexity
+Creating DP table	O(n × W) space
+Filling DP table	O(n × W) time
+Overall Time Complexity	O(n × W)
+Space Complexity	O(n × W)
+
+Where:
+- n = Number of items.
+- W = Knapsack capacity.
+Explanation:
+- Time complexity is O(n × W) because we use two nested loops.
+- Space complexity is O(n × W) because we store results in a 2D DP array.
+Note: This is pseudo-polynomial time complexity because it depends on the numerical value of capacity W, not just the number of input bits.
+
+  Conclusion
+Successfully implemented the 0/1 Knapsack Problem using Dynamic Programming in Java. The program calculates the maximum profit without exceeding the knapsack capacity, where each item can either be selected completely or rejected.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Important Viva Questions and Answers
+Basic Questions
+No.	Question	One-Line Answer
+1	What is the Knapsack Problem?	An optimization problem to maximize profit within a fixed capacity.
+2	What is 0/1 Knapsack?	A problem where each item is either completely selected or rejected.
+3	Why is it called 0/1 Knapsack?	Because each item has only two choices: 0 or 1.
+4	Which technique is used?	Dynamic Programming.
+5	What is Dynamic Programming?	A technique that stores previously calculated results to avoid repeated calculations.
+6	What is an optimization problem?	A problem that finds the best possible solution.
+7	Can we divide items in 0/1 Knapsack?	No, items cannot be divided.
+8	What is the objective?	To maximize profit without exceeding capacity.
+
+Questions Related to Your Code
+No.	Question	One-Line Answer
+9	Why do we use a 2D array?	To store maximum profits for different items and capacities.
+10	What is dp[][]?	A table that stores previously calculated maximum profits.
+11	What is the use of Math.max()?	It selects the greater value between two choices.
+12	Why do we use nested loops?	To calculate the maximum profit for every item and capacity combination.
+13	What is the base condition?	If there are no items or capacity is zero, profit is zero.
+14	What does dp[n][W] represent?	Maximum profit using n items and capacity W.
+15	Why do we use wt[i-1]?	Because array indexing starts from zero while DP indexing starts from one for items.
+16	What does return do?	It returns the calculated maximum profit.
+17	Why do we use Scanner?	To accept input from the user.
+18	What is a static method?	A method that can be called without creating an object.
+
+Complexity Questions
+No.	Question	One-Line Answer
+19	What is the time complexity?	O(n × W).
+20	What is the space complexity?	O(n × W).
+21	Why do we use two nested loops?	To process all combinations of items and capacities.
+22	What is n?	Number of items.
+23	What is W?	Maximum knapsack capacity.
+24	Can we reduce space complexity?	Yes, using a one-dimensional DP array with O(W) space.
+
+Important Tricky Questions
+No.	Question	One-Line Answer
+25	Difference between 0/1 and Fractional Knapsack?	0/1 does not allow fractions, while Fractional allows fractions.
+26	Can Greedy solve 0/1 Knapsack optimally?	Not in general.
+27	Which is better for 0/1 Knapsack, Greedy or DP?	Dynamic Programming guarantees an optimal solution for this formulation.
+28	What is overlapping subproblems?	When the same subproblems are solved repeatedly.
+29	What is optimal substructure?	An optimal solution can be built from optimal solutions to smaller subproblems.
+30	What happens if capacity is zero?	Maximum profit is zero.
+31	What happens if there are no items?	Maximum profit is zero.
+32	What is memoization?	Storing results of recursive calls for reuse.
+33	What is tabulation?	Solving subproblems using a table in bottom-up order.
+34	Which method is used in your code?	Tabulation (Bottom-Up Dynamic Programming).
+35	What is Branch and Bound?	An optimization technique that explores solutions while eliminating unpromising branches.
+36	Is Dynamic Programming greedy?	No, it considers and compares possible choices using stored subproblem results.
