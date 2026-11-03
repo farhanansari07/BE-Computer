@@ -1,0 +1,313 @@
+Q. Write a program to solve a fractional Knapsack problem using a greedy method. 
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+import java.util.*;
+
+class Item {
+    int weight, profit;
+    double ratio;
+
+    Item(int weight, int profit) {
+        this.weight = weight;
+        this.profit = profit;
+        this.ratio = (double) profit / weight;
+    }
+}
+
+public class FractionalKnapsack {
+
+    static void knapsack(Item items[], int capacity) {
+
+        // Sort items by profit/weight ratio
+        Arrays.sort(items, (a, b) ->
+            Double.compare(b.ratio, a.ratio)
+        );
+
+        double totalProfit = 0;
+
+        for (int i = 0; i < items.length; i++) {
+
+            if (capacity == 0)
+                break;
+
+            // Take complete item
+            if (items[i].weight <= capacity) {
+
+                capacity -= items[i].weight;
+                totalProfit += items[i].profit;
+            }
+
+            // Take fractional item
+            else {
+
+                totalProfit += items[i].ratio * capacity;
+                capacity = 0;
+            }
+        }
+
+        System.out.println("Maximum Profit: " + totalProfit);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of items: ");
+        int n = sc.nextInt();
+
+        Item items[] = new Item[n];
+
+        for (int i = 0; i < n; i++) {
+
+            System.out.print("Enter weight of item " + (i+1) + ": ");
+            int weight = sc.nextInt();
+
+            System.out.print("Enter profit of item " + (i+1) + ": ");
+            int profit = sc.nextInt();
+
+            items[i] = new Item(weight, profit);
+        }
+
+        System.out.print("Enter knapsack capacity: ");
+        int capacity = sc.nextInt();
+
+        knapsack(items, capacity);
+
+        sc.close();
+    }
+}
+
+// Example Input/Output
+// Input:
+// Enter number of items: 3
+// Enter weight of item 1: 10
+// Enter profit of item 1: 60
+// Enter weight of item 2: 20
+// Enter profit of item 2: 100
+// Enter weight of item 3: 30
+// Enter profit of item 3: 120
+// Enter knapsack capacity: 50
+// Output:
+// Maximum Profit: 240.0
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+C++ Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#include <iostream>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+// Function to print the DP table
+void printTable(const vector<vector<int>>& dp, int n, int W) {
+    cout << "\nDP Table:\n";
+    for (int i = 0; i <= n; i++) {
+        for (int w = 0; w <= W; w++) {
+            cout << setw(5) << dp[i][w];
+        }
+        cout << endl;
+    }
+}
+
+// Function to solve the Knapsack problem using dynamic programming and return selected items
+int knapsackDP(const vector<int>& weights, const vector<int>& values, int W, vector<int>& selectedItems) {
+    int n = weights.size();
+    vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
+
+    // Fill the DP table
+    for (int i = 1; i <= n; i++) {
+        for (int w = 1; w <= W; w++) {
+            if (weights[i - 1] <= w) {
+                dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - weights[i - 1]] + values[i - 1]);
+            } else {
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+
+    // Print the DP table
+    printTable(dp, n, W);
+
+    // Backtrack to find the selected items
+    int maxProfit = dp[n][W];
+    int w = W;
+    for (int i = n; i > 0 && maxProfit > 0; i--) {
+        if (maxProfit != dp[i - 1][w]) {  // Item i-1 was included
+            selectedItems.push_back(i);    // Save the index (1-based) of selected item
+            maxProfit -= values[i - 1];
+            w -= weights[i - 1];
+        }
+    }
+
+    return dp[n][W];
+}
+
+int main() {
+    int choice;
+    do {
+        cout << "\nKnapsack Problem Solver";
+        cout << "\n1. Solve Knapsack Problem using DP";
+        cout << "\n2. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            int n, W;
+            cout << "Enter the number of items: ";
+            cin >> n;
+
+            vector<int> weights(n), values(n);
+            cout << "Enter the weight and value of each item:\n";
+            for (int i = 0; i < n; i++) {
+                cout << "Item " << i + 1 << " - Weight: ";
+                cin >> weights[i];
+                cout << "Item " << i + 1 << " - Value: ";
+                cin >> values[i];
+            }
+
+            cout << "Enter the maximum capacity of the knapsack: ";
+            cin >> W;
+
+            vector<int> selectedItems;
+            int maxProfit = knapsackDP(weights, values, W, selectedItems);
+            cout << "\nThe maximum profit is: " << maxProfit << endl;
+
+            cout << "Items included in the knapsack (1-based index): ";
+            for (int item : selectedItems)
+                cout << item << " ";
+            cout << endl;
+
+        } else if (choice != 2) {
+            cout << "Invalid choice! Please try again.\n";
+        }
+    } while (choice != 2);
+
+    cout << "Program exited.\n";
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 1. Aim
+To write a Java program to solve the Fractional Knapsack Problem using the Greedy Method and analyze its time and space complexity.
+
+ 2. Theory
+The Knapsack Problem is an optimization problem in which we are given a bag (knapsack) with a fixed capacity and a set of items, each having a weight and a profit.
+
+The objective is to select items in such a way that the total profit is maximum without exceeding the capacity of the knapsack.
+
+There are two main types of Knapsack Problems:
+1. 0/1 Knapsack: We can either take the complete item or leave it. We cannot divide an item.
+2. Fractional Knapsack: We can take the complete item or a fraction of it.
+The Fractional Knapsack Problem is solved using the Greedy Method.
+
+In this method:
+- Calculate the profit-to-weight ratio of every item.
+- Sort items in descending order of their ratio.
+- Select the item with the highest ratio first.
+- If the complete item cannot fit, take only the required fraction.
+- Continue until the knapsack becomes full.
+Formula:
+Ratio = Profit/Weight
+
+Maximum Profit = sum (Profit * Fraction)
+
+ 3. Real-Life Examples
+
+1. Packing a Suitcase
+Suppose you have limited luggage capacity. You select items based on their value and weight to maximize the value you can carry.
+
+2. Gold Transportation
+If you have limited carrying capacity, you can select portions of gold based on their value and weight.
+
+
+3. Cargo Loading
+A truck has limited capacity, so goods can be selected according to their value per unit weight.
+
+
+ 4. Algorithm
+1. Start.
+2. Read the number of items.
+3. Read the weight and profit of each item.
+4. Calculate the profit-to-weight ratio for every item.
+5. Sort the items in descending order of their ratio.
+6. Read the knapsack capacity.
+7. Initialize total profit = 0.
+8. Select items having the highest ratio first.
+9. If the complete item fits, take it.
+10. Otherwise, take the fraction that fits.
+11. Calculate the total profit.
+12. Print the maximum profit.
+13. Stop.
+
+Time and Space Complexity
+Operation	Complexity
+Calculating ratios	O(n)
+Sorting items	O(n log n)
+Selecting items	O(n)
+Overall Time Complexity	O(n log n)
+Space Complexity	O(n)
+
+Explanation:
+- Time Complexity – O(n log n): Sorting takes O(n log n), and selecting items takes O(n).
+- Space Complexity – O(n): We store n items in an array. Java's object-array sorting may also use additional temporary space.
+
+ 5. Conclusion
+Successfully implemented the Fractional Knapsack Problem using the Greedy Method in Java. The program selects items based on their profit-to-weight ratio to maximize total profit within the given capacity.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Important Viva Questions and Answers
+Basic Questions
+No.	Question	One-Line Answer
+1	What is the Knapsack Problem?	An optimization problem to maximize profit within a fixed capacity.
+2	What is Fractional Knapsack?	A problem where items can be divided into fractions.
+3	Which technique is used?	Greedy Method.
+4	What is a Greedy Algorithm?	It selects the locally best option at each step.
+5	What is profit?	The value earned by selecting an item.
+6	What is weight?	The amount of capacity occupied by an item.
+7	What is capacity?	The maximum weight the knapsack can hold.
+8	What is the profit-to-weight ratio?	Profit divided by weight.
+
+Questions Related to Your Code
+No.	Question	One-Line Answer
+9	Why do we calculate the ratio?	To identify the most profitable item per unit weight.
+10	Why do we sort items?	To select items with the highest ratio first.
+11	What is the use of Arrays.sort()?	It sorts the items according to the given comparator.
+12	What is a class in Java?	A blueprint used to create objects.
+13	What is a constructor?	A special method used to initialize an object.
+14	Why do we use double?	To store decimal values and fractional profits.
+15	What does totalProfit store?	The total profit earned from selected items.
+16	Why do we use capacity = 0?	To indicate that the knapsack is full.
+17	What is the use of break?	It immediately terminates the loop.
+18	Why do we use static?	To call a method without creating an object.
+
+Complexity Questions
+No.	Question	One-Line Answer
+19	What is the time complexity?	O(n log n).
+20	What is the space complexity?	O(n).
+21	What is the sorting complexity?	O(n log n).
+22	What is the selection complexity?	O(n).
+23	Why is sorting required?	To arrange items in descending order of their ratios.
+
+Important Tricky Questions
+No.	Question	One-Line Answer
+24	Difference between 0/1 and Fractional Knapsack?	0/1 takes the whole item or none, while Fractional allows partial items.
+25	Can we use Greedy in 0/1 Knapsack?	Greedy does not guarantee an optimal solution for 0/1 Knapsack.
+26	Which item is selected first?	The item with the highest profit-to-weight ratio.
+27	Can we take half an item?	Yes, Fractional Knapsack allows fractions.
+28	Is Fractional Knapsack optimal using Greedy?	Yes, for non-negative profits and positive weights.
+29	What happens if the capacity is greater than total weight?	All items are selected.
+30	What happens if capacity is zero?	Maximum profit is zero.
+31	What is an optimization problem?	A problem that finds the best possible solution.
+32	What is the main advantage of Greedy?	It is simple and efficient.
+33	What is the difference between Greedy and Dynamic Programming?	Greedy makes local choices, while DP stores and combines solutions to subproblems.
+34	Can two items have the same ratio?	Yes, and either can be selected first.
+35	Give a real-life application.	Loading valuable goods into a truck with limited capacity.
