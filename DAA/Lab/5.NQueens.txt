@@ -1,0 +1,353 @@
+Q.Design n-Queens matrix having first Queen placed. Use backtracking to place remaining 
+Queens to generate the final n-queen’s matrix.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+import java.util.Scanner;
+
+public class NQueens {
+
+    static int N;
+
+    // Check whether position is safe
+    static boolean isSafe(int board[][], int row, int col) {
+
+        // Check same column
+        for (int i = 0; i < row; i++) {
+            if (board[i][col] == 1)
+                return false;
+        }
+
+        // Check upper left diagonal
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        // Check upper right diagonal
+        for (int i = row, j = col; i >= 0 && j < N; i--, j++) {
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        return true;
+    }
+
+    // Solve using Backtracking
+    static boolean solve(int board[][], int row) {
+
+        // All Queens are placed
+        if (row == N)
+            return true;
+
+        // Try each column
+        for (int col = 0; col < N; col++) {
+
+            if (isSafe(board, row, col)) {
+
+                board[row][col] = 1;
+
+                if (solve(board, row + 1))
+                    return true;
+
+                // Backtracking
+                board[row][col] = 0;
+            }
+        }
+
+        return false;
+    }
+
+    // Print chessboard
+    static void printBoard(int board[][]) {
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter value of N: ");
+        N = sc.nextInt();
+
+        if (N <= 0) {
+            System.out.println("N must be a positive integer.");
+        } else {
+            int board[][] = new int[N][N];
+
+            if (solve(board, 0)) {
+                System.out.println("N-Queens Solution:");
+                printBoard(board);
+            }
+            else {
+                System.out.println("Solution does not exist.");
+            }
+        }
+
+        sc.close();
+    }
+}
+
+// Example Input/Output
+// Input: Enter value of N: 4
+// Output:
+// N-Queens Solution:
+// 1 0 0 0
+// 0 0 1 0
+// 0 0 0 1
+// 0 1 0 0
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+C++ Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#include<bits/stdc++.h>
+using namespace std;
+
+
+/// using Backtracking 
+bool isItSafe(int row,int col,vector<string>&board,int n){
+    int preRow=row;
+    int preCol=col;
+
+    while(row>=0 && col>=0){
+        if(board[row][col]=='Q'){
+            return false;
+        }
+        row--;
+        col--;
+    }
+
+    row=preRow;
+    col=preCol;
+
+    while(col>=0){
+        if(board[row][col]=='Q'){
+            return false;
+        }
+        col--;
+    }
+
+    row=preRow;
+    col=preCol;
+    while(row<n && col>=0){
+        if(board[row][col]=='Q'){
+            return false;
+        }
+        row++;
+        col--;
+    }
+
+    return true;
+}
+
+
+void solve(int col,vector<string>&board,vector<vector<string>>&ans,int n){
+    if(col==n){
+        ans.push_back(board);
+        return;
+    }
+    else{
+        for(int i=0;i<n;i++){ //O(N)
+            if(isItSafe(i,col,board,n)){ //O(N)  -->> O(N2)
+                board[i][col]='Q';
+                solve(col+1,board,ans,n);
+                //backtrack
+                board[i][col]='.';
+            }
+        }
+    }
+}
+
+//using branch and bound 
+
+void solve(int col,vector<int>&Left,vector<int>LeftDiag,vector<int>RightDiag,vector<string>&board,vector<vector<string>>&ans,int n){
+    if(col==n){
+        ans.push_back(board);
+        return;
+    }
+
+    else{
+        for(int i=0;i<n;i++){
+            if(Left[i]==0 && LeftDiag[i+col]==0 && RightDiag[i-col+n-1]==0){
+                board[i][col]='Q';
+                Left[i]=1;
+                LeftDiag[i+col]=1;
+                RightDiag[i-col+n-1]=1;
+                //backtrack
+                solve(col+1,Left,LeftDiag,RightDiag,board,ans,n);
+                board[i][col]='.';
+                Left[i]=0;
+                LeftDiag[i+col]=0;
+                RightDiag[i-col+n-1]=0;
+            }
+        }
+    }
+}
+
+
+int main(){
+    int n;
+    cout<<"Enter the size of n"<<endl;
+    cin>>n;
+    vector<vector<string>>ans;
+    vector<string>board(n);
+    string s(n,'.');
+    for(int i=0;i<n;i++){
+        board[i]=s;
+    }
+
+    solve(0,board,ans,n);
+
+    ///using branch and bound --->> we are bounding our branches 
+
+    vector<int>Left(n,0);
+
+    //left diagonal
+    vector<int>LeftDiag(2*n-1,0);
+
+    //right diagonal
+
+    vector<int>RightDiag(2*n-1,0);
+
+    // solve(0,Left,LeftDiag,RightDiag,board,ans,n);
+    for(const auto row:ans){
+        for(const auto val:row){
+            cout<<val<<endl;
+        }
+        cout<<endl;
+    }
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To write a Java program to solve the N-Queens Problem using Backtracking by placing N Queens on an N × N chessboard so that no two Queens attack each other.
+
+2. Theory
+The N-Queens Problem is a classic problem in Data Structures and Algorithms in which we have to place N Queens on an N × N chessboard.
+
+The condition is that no two Queens should attack each other.
+
+A Queen can attack another Queen in three directions:
+1. Same row (horizontal).
+2. Same column (vertical).
+3. Same diagonal.
+We use the Backtracking Algorithm to solve this problem.
+
+What is Backtracking?
+Backtracking is an algorithmic technique that tries to find a solution by making choices one by one. If a choice leads to an invalid solution, it goes back and tries another choice.
+
+Working:
+- Place a Queen in a safe position.
+- Move to the next row.
+- Check whether the position is safe.
+- If safe, place the Queen.
+- If no safe position is available, remove the previously placed Queen and try another position.
+- Continue until all N Queens are placed.
+Important: Only one Queen is placed in each row and each column.
+
+ 3. Real-Life Examples
+
+1. Chess Game
+Placing chess pieces on a board without allowing Queens to attack each other.
+
+2. Timetable Scheduling
+Assigning exams to time slots while avoiding scheduling conflicts.
+
+3. Network Channel Assignment
+Assigning channels while avoiding interference between conflicting devices.
+
+ 4. Algorithm
+1. Start.
+2. Read the value of N.
+3. Create an N × N chessboard and initialize all positions with 0.
+4. Place the first Queen in the first row.
+5. Check whether the current position is safe.
+6. If safe, place the Queen and move to the next row.
+7. If all Queens are placed, print the chessboard.
+8. If no safe position is available, remove the previously placed Queen.
+9. Try another column.
+10. Stop when a solution is found.
+
+ 5.Step-by-Step Explanation
+For N = 4, we have a 4 × 4 chessboard.
+The program initially places the first Queen at (0,0).
+The program follows these steps:
+1. Place Queen 1 at row 1, column 1.
+2. Move to row 2 and find a safe position at column 3.
+3. Move to row 3 and find a safe position at column 4.
+4. Move to row 4 and find a safe position at column 2.
+5. All four Queens are placed successfully.
+
+Time and Space Complexity
+Complexity	Value
+Time Complexity	O(N!)
+Space Complexity	O(N²)
+
+Explanation:
+- Time Complexity – O(N!): The algorithm tries different column positions for each row using backtracking. The number of possible arrangements is bounded by N!.
+- Space Complexity – O(N²): The chessboard requires an N × N matrix. Recursion additionally requires O(N) stack space.
+
+ 6. Conclusion
+Successfully implemented the N-Queens Problem using Backtracking in Java. The program places N Queens on an N × N chessboard so that no two Queens attack each other.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Important Viva Questions and Answers
+Basic Questions
+No.	Question	One-Line Answer
+1	What is the N-Queens Problem?	Placing N Queens on an N × N board without attacking each other.
+2	Which technique is used?	Backtracking.
+3	What is Backtracking?	Trying possible solutions and going back when a choice fails.
+4	What is a Queen in chess?	A piece that moves horizontally, vertically and diagonally.
+5	What is a safe position?	A position where no existing Queen can attack the new Queen.
+6	What is recursion?	A function calling itself.
+7	What is the base condition?	When all N Queens are successfully placed.
+8	What does 1 represent?	A Queen on the chessboard.
+9	What does 0 represent?	An empty position.
+10	What is the objective?	To place all Queens without conflicts.
+
+Questions Related to Your Code
+No.	Question	One-Line Answer
+11	What is the use of isSafe()?	It checks whether a position is safe for a Queen.
+12	What is the use of solve()?	It places Queens using backtracking.
+13	Why do we use a 2D array?	To represent the chessboard.
+14	Why do we use a boolean function?	To return true or false depending on whether a solution exists.
+15	Why do we check the same column?	To prevent two Queens from being in the same column.
+16	Why do we check diagonals?	Queens can attack diagonally.
+17	Why do we use row + 1?	To move to the next row.
+18	What is the use of board[row][col] = 0?	It removes the Queen during backtracking.
+19	Why do we place one Queen per row?	To avoid horizontal attacks.
+20	Why do we place the first Queen?	To fix the starting position as required by the problem.
+
+Complexity Questions
+No.	Question	One-Line Answer
+21	What is the time complexity?	O(N!).
+22	What is the space complexity?	O(N²) for the board.
+23	Why is backtracking better than checking every board?	It eliminates invalid arrangements early.
+24	What is the recursion stack?	Memory used to store recursive function calls.
+25	What is pruning?	Skipping choices that cannot lead to a valid solution.
+
+Important Tricky Questions
+No.	Question	One-Line Answer
+26	What is the minimum N for a solution?	N = 4.
+27	Is there a solution for N = 2?	No.
+28	Is there a solution for N = 3?	No.
+29	How many Queens are placed?	Exactly N Queens.
+30	Can two Queens share a row?	No.
+31	Can two Queens share a column?	No.
+32	Can two Queens share a diagonal?	No.
+33	What happens if no safe position is found?	The algorithm backtracks to the previous row.
+34	What is the difference between recursion and backtracking?	Recursion is a function technique; backtracking uses recursion or iteration to explore choices and undo failed ones.
+35	Can N-Queens have multiple solutions?	Yes, depending on N.
+36	What is the difference between finding one solution and all solutions?	One solution stops after the first valid arrangement; all solutions explores every valid arrangement.
