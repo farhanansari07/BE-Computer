@@ -1,0 +1,331 @@
+Q.Write a program non-recursive and recursive program to calculate Fibonacci numbers and 
+analyze their time and space complexity. 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+import java.util.Scanner;
+
+public class Fibonacci {
+
+    // Non-Recursive Method
+    static void iterative(int n) {
+
+        int a = 0, b = 1, c;
+
+        System.out.print("Non-Recursive: ");
+
+        for (int i = 0; i < n; i++) {
+            System.out.print(a + " ");
+
+            c = a + b;
+            a = b;
+            b = c;
+        }
+
+        System.out.println();
+    }
+
+    // Recursive Method
+    static int recursive(int n) {
+
+        if (n == 0)
+            return 0;
+
+        if (n == 1)
+            return 1;
+
+        return recursive(n - 1) + recursive(n - 2);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of terms: ");
+        int n = sc.nextInt();
+
+        // Calling Non-Recursive Method
+        iterative(n);
+
+        // Calling Recursive Method
+        System.out.print("Recursive: ");
+
+        for (int i = 0; i < n; i++) {
+            System.out.print(recursive(i) + " ");
+        }
+
+        sc.close();
+    }
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+C++ Code
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#include<bits/stdc++.h>
+using namespace std;
+
+//Recurisve function 
+int fibRec(int n){
+    if(n<0){
+        //negative 
+        return -1;
+    }
+    if(n==0|| n==1){
+        return n;
+    }
+    else{
+        return fibRec(n-1)+fibRec(n-2);
+    }
+}
+
+//iterative
+int fibIter(int n){ 
+    if(n<0){
+        //negative 
+        return -1;
+    }
+    if(n==0|| n==1){
+        return n;
+    }
+
+    int a=0;
+    int b=1;
+    int c; //third value
+    for(int i=2;i<=n;i++){
+        c=a+b;
+        a=b;
+        b=c;
+    }
+    return b;
+}
+
+
+
+
+
+//printing n fiboacci numbers
+void printFibSeries(int n){
+    if(n<0){
+        //negative 
+        cout<<"Enter positive number"<<endl;
+        return;
+    }
+    if(n==0|| n==1){
+        cout<<n<<" ";
+        return;
+    }
+
+    int a=0;
+    int b=1;
+    cout<<a<<" "<<b<<" ";
+    int c; //third value
+    for(int i=2;i<=n;i++){
+        c=a+b;
+        cout<<c<<" ";
+        a=b;
+        b=c;
+    }
+    cout<<endl;
+}
+
+
+int main(){
+    while(true){
+        cout<<"Enter 1 to print nth fibonacci number using recursion"<<endl;
+        cout<<"Enter 2 to print nth fibonacci number using iterative"<<endl;
+        cout<<"Enter 3 to print fibonacci series"<<endl;
+        int op;
+        cout<<"Enter option"<<endl;
+        cin>>op;
+        if(op==1){
+            int n1;
+            cout<<"Enter the value of n"<<endl;
+            cin>>n1;
+            int res=fibRec(n1);
+            cout<<"Result is: "<<res<<endl;
+        }
+        else if(op==2){
+            int n2;
+            cout<<"Enter the value of n"<<endl;
+            cin>>n2;
+            int res=fibIter(n2);
+            cout<<"Result is: "<<res<<endl;
+        }
+        else if(op==3){
+            int n3;
+            cout<<"Enter the value of n"<<endl;
+            cin>>n3;
+            printFibSeries(n3);
+        }
+        else{
+            cout<<"Invalid option"<<endl;
+        }
+
+    }
+    return 0;
+}
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+ 1. Aim
+To write recursive and non-recursive Java programs to generate Fibonacci numbers and analyze their time and space complexity.
+
+ 2. Theory
+The Fibonacci series is a sequence of numbers in which each number is obtained by adding the previous two numbers.
+
+The series starts with 0 and 1. The next number is calculated by adding the previous two numbers.
+
+Example:
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, 34...
+
+Mathematical Formula:
+\[
+F(n)=F(n-1)+F(n-2)
+\]
+
+Where:
+- F(0) = 0
+- F(1) = 1
+- F(n) = F(n-1) + F(n-2), for n ≥ 2.
+There are two approaches to generate the Fibonacci series:
+
+1. Recursive Method
+
+In the recursive method, a function calls itself to calculate the Fibonacci number. It breaks the problem into smaller subproblems until it reaches the base conditions.
+
+The base conditions are:
+- If n = 0, return 0.
+- If n = 1, return 1.
+
+Recursive time	O(2ⁿ)
+Recursive space	O(n)
+
+2. Non-Recursive Method (Iterative)
+
+In the non-recursive method, loops are used to generate Fibonacci numbers. It uses three variables to store the previous two numbers and calculate the next number.
+
+It does not involve repeated function calls.
+
+Iterative time	O(n)
+Iterative space	O(1)
+
+Difference between Recursive and Non-Recursive Methods:
+Recursive	Non-Recursive
+Uses function calls.	Uses loops.
+Uses call stack memory.	Uses constant extra memory.
+Slower for large inputs.	Faster for large inputs.
+Easy to understand mathematically.	More efficient in execution.
+
+ 3. Algorithm
+
+A. Non-Recursive Algorithm
+
+1. Start.
+2. Read the number of terms n.
+3. Initialize a = 0 and b = 1.
+4. Repeat the loop n times.
+5. Print the value of a.
+6. Calculate c = a + b.
+7. Update a = b and b = c.
+8. Stop.
+
+B. Recursive Algorithm
+
+1. Start.
+2. Read the number of terms n.
+3. Create a recursive function fib(n).
+4. If n = 0, return 0.
+5. If n = 1, return 1.
+6. Otherwise, return fib(n-1) + fib(n-2).
+7. Call the function for each number from 0 to n-1.
+8. Print the Fibonacci series.
+9. Stop.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Real-Life Examples of Fibonacci Series
+Example 1: Rabbit Population 🐇
+The Fibonacci sequence is traditionally explained using rabbit reproduction.
+
+Suppose:
+- Initially, there is one pair of rabbits.
+- Each mature pair produces one new pair every month.
+- New pairs become mature after one month.
+The population follows the Fibonacci sequence:
+Month	Rabbit Pairs
+1	1
+2	1
+3	2
+4	3
+5	5
+6	8
+7	13
+
+Fibonacci-like patterns can be observed in:
+- Sunflower seed arrangements.
+- Pine cones.
+- Some flower petal arrangements.
+- Spiral patterns in certain shells.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. What is Fibonacci series?	
+A series where each number is the sum of the previous two numbers.
+2. What are the first two Fibonacci numbers?	
+0 and 1.
+3. What is the formula?	
+F(n) = F(n-1) + F(n-2).
+4. What is recursion?	
+A function calling itself.
+5. What is iteration?	
+Repeating statements using loops.
+6. What is a base condition?	
+A condition that stops recursive calls.
+7. What is an algorithm?	
+A step-by-step procedure to solve a problem.
+8. What is DAA?	
+Design and Analysis of Algorithms.
+
+9. Why do we use Scanner?	To accept input from the user.
+10. What is static in Java?	It allows a method to be called without creating an object.
+11. Why is iterative() void?	Because it prints the series and does not return a value.
+12. Why is recursive() int?	Because it returns an integer Fibonacci number.
+13. What is the use of return?	It sends a value back from a method.
+14. What is the use of for loop?	To repeat statements a fixed number of times.
+15. Why do we use n == 0?	It is the first base condition of recursion.
+16. Why do we use n == 1?	It is the second base condition of recursion.
+17. What is the use of a, b, and c?	They store the previous two numbers and their sum.
+18. Why do we call iterative(n)?	To generate Fibonacci numbers using a loop.
+19. Why do we call recursive(i) inside a loop?	To print each Fibonacci number from 0 to n-1.
+20. Why do we close Scanner?	To release the input resource.
+
+21. What is time complexity?	It measures how execution time grows with input size.
+22. What is space complexity?	It measures how memory usage grows with input size.
+23. Iterative time complexity?	O(n).
+24. Recursive time complexity?	O(2ⁿ), commonly used upper-bound estimate.
+25. Iterative space complexity?	O(1).
+26. Recursive space complexity?	O(n).
+27. Which method is faster?	Iterative method.
+28. Why is recursion slower?	Because it recalculates the same values multiple times.
+29. What is stack overflow?	An error caused when the call stack runs out of memory.
+30. How can we optimize recursive Fibonacci?	By using Dynamic Programming or memoization.
+
+31. Can Fibonacci start with 1 and 1?	Yes, some representations use 1, 1 as the starting terms.
+32. What happens if n = 1?	The output is 0.
+33. What happens if n = 2?	The output is 0 and 1.
+34. What happens if n = 0?	No Fibonacci numbers are printed.
+35. Is Fibonacci a linear or non-linear recurrence?	It is a linear recurrence relation of order two.
+36. What is Dynamic Programming?	A technique that stores previously calculated results to avoid repeated work.
+37. What is memoization?	Storing results of recursive function calls for reuse.
+38. What is the return type of main()?	void.
+39. Can Java support recursion?	Yes, Java supports recursive methods.
+40. What is the advantage of iteration?	It uses less memory and avoids repeated function calls.
