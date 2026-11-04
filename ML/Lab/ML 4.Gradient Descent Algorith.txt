@@ -1,0 +1,182 @@
+Implement Gradient Descent Algorithm to find the local minima of a function. 
+For example, find the local minima of the function y=(x+3)² starting from the point x=2.
+
+
+import matplotlib.pyplot as plt
+
+# Function
+def f(x):
+    return (x + 3) ** 2
+
+# Derivative
+def df(x):
+    return 2 * (x + 3)
+
+# Initial values
+x = 2
+learning_rate = 0.1
+precision = 0.00001
+max_iterations = 100
+
+# Store values for plotting
+x_values = [x]
+y_values = [f(x)]
+
+# Gradient Descent
+for i in range(max_iterations):
+
+    gradient = df(x)
+
+    # Gradient Descent formula
+    x_new = x - learning_rate * gradient
+
+    x_values.append(x_new)
+    y_values.append(f(x_new))
+
+    if abs(x_new - x) < precision:
+        break
+
+    x = x_new
+
+# Display result
+print("Starting point:", 2)
+print("Number of iterations:", i + 1)
+print(f"Local minimum occurs at x = {x_new:.5f}")
+print(f"Minimum value of y = {f(x_new):.5f}")
+
+# Plot the function
+x_plot = [i / 10 for i in range(-100, 41)]
+y_plot = [f(i) for i in x_plot]
+
+plt.plot(x_plot, y_plot, label="y = (x + 3)^2")
+plt.scatter(x_values, y_values, label="Gradient Descent Steps")
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Gradient Descent")
+plt.legend()
+plt.grid()
+plt.show()
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To implement the Gradient Descent Algorithm in Python to find the local minimum of the function (y=(x+3)^2), starting from the initial point x=2.
+
+2. Theory
+1. Gradient Descent
+
+Gradient Descent is an optimization algorithm used in Machine Learning to find the minimum value of a function.
+
+It works by repeatedly updating the input value in the direction opposite to the gradient (slope) until it reaches the minimum point.
+
+2. Objective of Gradient Descent
+
+The main objective is to minimize the function by finding the value of x where the function has the lowest value.
+
+3. Given Function
+y=(x+3)^2
+
+- Initial point: x=2
+- Learning rate: 0.1
+- Precision: 0.00001
+- Maximum iterations: 100
+4. Derivative
+
+The derivative represents the slope of a function.
+
+For the given function:
+{dy}/{dx}=2(x+3)
+
+5. Gradient Descent Formula
+x_{new}=x_{old}-alpha f'(x)
+
+Where:
+- x_{new} = Updated value of x.
+- x_{old} = Previous value of x.
+- alpha = Learning rate.
+- f'(x) = Derivative of the function.
+6. Learning Rate
+
+Learning rate controls how big a step the algorithm takes towards the minimum point.
+- Small learning rate: Slow convergence.
+- Large learning rate: May overshoot the minimum.
+- Proper learning rate: Helps reach the minimum efficiently.
+7. Precision
+
+Precision is the stopping condition of the algorithm.
+
+In this practical, the algorithm stops when the difference between two consecutive x values becomes smaller than 0.00001.
+
+8. Working of the Algorithm
+1. Initialize x = 2.
+2. Calculate the derivative.
+3. Update x using the Gradient Descent formula.
+4. Repeat the process until the stopping condition is satisfied.
+5. Display the minimum value and plot the graph.
+3. Expected Output
+The minimum point of the function is:
+Local minimum point
+x = -3.00000
+
+Minimum value of y = 0.00000
+
+The algorithm starts at x = 2 and gradually moves towards x = -3.
+4. Conclusion
+Successfully implemented the Gradient Descent Algorithm to find the local minimum of the function \(y=(x+3)^2\), starting from x = 2. The algorithm repeatedly updates the value of x using the derivative and learning rate until the minimum point is reached.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viva Questions and Answers
+Important viva questions
+No.	Question	One-line Answer
+1	What is Gradient Descent?	It is an optimization algorithm used to find the minimum value of a function.
+2	Why is Gradient Descent used?	It is used to minimize the loss function in Machine Learning.
+3	What is a gradient?	A gradient represents the slope or rate of change of a function.
+4	What is a derivative?	A derivative measures the rate of change of a function.
+5	What is local minimum?	It is the lowest function value within a nearby region.
+6	What is global minimum?	It is the lowest value of a function over its entire domain.
+7	What is the learning rate?	It controls the step size during each update.
+8	What happens if learning rate is too high?	The algorithm may overshoot the minimum or fail to converge.
+9	What happens if learning rate is too low?	The algorithm takes more iterations to reach the minimum.
+10	What is convergence?	Convergence means the algorithm approaches a stable solution.
+11	What is precision?	It defines the stopping condition based on the difference between consecutive values.
+12	What is an iteration?	One complete update of the variable is called an iteration.
+13	What is the derivative of the given function?	The derivative is 2(x + 3).
+14	What is the initial value of x?	x = 2.
+15	What is the learning rate in this practical?	0.1.
+16	What is the minimum point?	x = -3.
+17	What is the minimum value of y?	0.
+18	What is the stopping condition?	When the change in x becomes smaller than the precision value.
+19	What is an optimization algorithm?	It finds the best solution by minimizing or maximizing an objective function.
+20	Where is Gradient Descent used?	It is commonly used to train machine learning and deep learning models.
+21	What is a cost function?	It measures the error between actual and predicted values.
+22	What is the difference between local and global minima?	Local minimum is lowest nearby, while global minimum is lowest overall.
+23	Can Gradient Descent get stuck in a local minimum?	Yes, depending on the function and starting point.
+24	What is batch Gradient Descent?	It calculates the gradient using the entire training dataset.
+25	What is stochastic Gradient Descent?	It updates model parameters using one training sample at a time.
+
+6. Important Code-Based Viva Questions
+Code	Purpose
+def f(x)	Defines the given mathematical function.
+return (x+3)**2	Calculates the function value.
+def df(x)	Defines the derivative function.
+return 2*(x+3)	Calculates the derivative.
+x = 2	Sets the initial point.
+learning_rate = 0.1	Sets the step size.
+precision = 0.00001	Sets the stopping condition.
+max_iterations = 100	Sets the maximum number of iterations.
+gradient = df(x)	Calculates the gradient.
+x - learning_rate * gradient	Updates x using Gradient Descent.
+abs(x_new - x)	Calculates the difference between consecutive values.
+break	Stops the loop when the condition is satisfied.
+plt.plot()	Plots the function graph.
+plt.scatter()	Displays the Gradient Descent steps.
+plt.show()	Displays the graph.
+
+7. Important Differences
+Gradient Descent	Normal Derivative Method
+Uses repeated updates.	Uses mathematical differentiation.
+Moves gradually towards the minimum.	Can directly find stationary points by setting derivative to zero.
+Depends on learning rate.	Does not require learning rate.
+Useful for large ML optimization problems.	Useful for analytical mathematical solutions.

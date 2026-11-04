@@ -1,0 +1,406 @@
+Classify the email using the binary classification method. Email Spam detection has two 
+states: a) Normal State – Not Spam, b) Abnormal State – Spam. Use K-Nearest Neighbors and 
+Support Vector Machine for classification. Analyze their performance. 
+Dataset link: The emails.csv dataset on the Kaggle 
+https://www.kaggle.com/datasets/balaka18/email-spam-classification-dataset-csv
+
+
+#Swaraj Ambawade
+#Import Libraries
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+    roc_curve,
+    auc,
+    precision_recall_curve
+)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+#Load Dataset
+df = pd.read_csv("emails.csv")   # Change path if needed
+
+df.head()
+
+
+
+#Data Preprocessing
+print("Dataset Shape :", df.shape)
+
+# Features and Target
+X = df.drop(columns=["Email No.", "Prediction"])
+y = df["Prediction"]
+
+# Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+
+
+#Create Models
+knn = KNeighborsClassifier(n_neighbors=5)
+
+svm = SVC(
+    kernel='linear',
+    probability=True,
+    random_state=42
+)
+
+
+
+
+
+#Train Models
+knn.fit(X_train, y_train)
+svm.fit(X_train, y_train)
+
+
+
+
+#Prediction
+y_pred_knn = knn.predict(X_test)
+y_pred_svm = svm.predict(X_test)
+
+
+
+
+#Evaluation Function
+def evaluate_model(y_true, y_pred, model_name):
+
+    accuracy = accuracy_score(y_true, y_pred)
+    precision = precision_score(y_true, y_pred)
+    recall = recall_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred)
+
+    print(f"\n----- {model_name} -----")
+    print("Accuracy :", accuracy)
+    print("Precision:", precision)
+    print("Recall   :", recall)
+    print("F1 Score :", f1)
+
+    return [accuracy, precision, recall, f1]
+
+
+
+
+
+
+#Evaluate Models
+knn_metrics = evaluate_model(
+    y_test,
+    y_pred_knn,
+    "KNN"
+)
+
+svm_metrics = evaluate_model(
+    y_test,
+    y_pred_svm,
+    "SVM"
+)
+
+
+
+
+
+
+
+
+
+#Confusion Matrix
+def plot_confusion(y_true, y_pred, title):
+
+    cm = confusion_matrix(y_true, y_pred)
+
+    plt.figure(figsize=(5,4))
+
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=["Not Spam","Spam"],
+        yticklabels=["Not Spam","Spam"]
+    )
+
+    plt.title(title)
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+
+    plt.show()
+
+
+
+
+
+
+
+
+#Display Confusion Matrix
+plot_confusion(
+    y_test,
+    y_pred_knn,
+    "KNN Confusion Matrix"
+)
+
+plot_confusion(
+    y_test,
+    y_pred_svm,
+    "SVM Confusion Matrix"
+)
+
+
+
+
+
+
+
+#ROC Curve & Precision-Recall Curve
+y_score_knn = knn.predict_proba(X_test)[:,1]
+y_score_svm = svm.predict_proba(X_test)[:,1]
+
+# ROC
+fpr_knn, tpr_knn, _ = roc_curve(y_test, y_score_knn)
+fpr_svm, tpr_svm, _ = roc_curve(y_test, y_score_svm)
+
+auc_knn = auc(fpr_knn, tpr_knn)
+auc_svm = auc(fpr_svm, tpr_svm)
+
+plt.figure(figsize=(12,5))
+
+plt.subplot(1,2,1)
+
+plt.plot(fpr_knn, tpr_knn,
+         label=f'KNN AUC={auc_knn:.2f}')
+
+plt.plot(fpr_svm, tpr_svm,
+         label=f'SVM AUC={auc_svm:.2f}')
+
+plt.plot([0,1],[0,1],'k--')
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend()
+
+# Precision Recall Curve
+
+precision_knn, recall_knn, _ = precision_recall_curve(
+    y_test,
+    y_score_knn
+)
+
+precision_svm, recall_svm, _ = precision_recall_curve(
+    y_test,
+    y_score_svm
+)
+
+plt.subplot(1,2,2)
+
+plt.plot(recall_knn,
+         precision_knn,
+         label="KNN")
+
+plt.plot(recall_svm,
+         precision_svm,
+         label="SVM")
+
+plt.xlabel("Recall")
+plt.ylabel("Precision")
+plt.title("Precision Recall Curve")
+plt.legend()
+
+plt.show()
+
+
+
+
+
+
+
+
+#Performance Comparison
+metrics = pd.DataFrame(
+    [knn_metrics, svm_metrics],
+    columns=[
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "F1 Score"
+    ],
+    index=[
+        "KNN",
+        "SVM"
+    ]
+)
+
+metrics
+
+
+
+
+
+#Bar Graph
+metrics.plot(
+    kind="bar",
+    figsize=(8,5)
+)
+
+plt.title("Performance Comparison")
+
+plt.ylabel("Score")
+
+plt.xticks(rotation=0)
+plt.show()
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To classify emails into two categories, Spam and Not Spam, using binary classification techniques K-Nearest Neighbors (KNN) and Support Vector Machine (SVM), and compare their performance using different evaluation metrics.
+2. Theory
+1. Binary Classification
+
+Binary classification is a supervised machine learning technique used to classify data into two categories.
+
+In this practical:
+- Normal State (0) – Not Spam.
+- Abnormal State (1) – Spam.
+2. Dataset Preprocessing
+
+Data preprocessing prepares the dataset for machine learning.
+
+In this practical:
+- Loaded the email dataset using Pandas.
+- Removed unnecessary columns like Email No..
+- Separated input features (X) and target variable (y).
+- Divided the dataset into 80% training and 20% testing data.
+3. K-Nearest Neighbors (KNN)
+
+KNN is a supervised machine learning algorithm that classifies data based on the majority class of its nearest neighbours.
+- It calculates the distance between data points.
+- It selects the nearest K neighbours.
+- It assigns the majority class as the final prediction.
+In this practical, K = 5.
+
+4. Support Vector Machine (SVM)
+
+SVM is a supervised machine learning algorithm used for classification.
+
+It finds the best decision boundary (hyperplane) that separates different classes with maximum margin.
+
+In this practical, a linear kernel is used.
+
+5. Model Evaluation
+
+The performance of KNN and SVM is evaluated using the following metrics:
+Metric	Meaning
+Accuracy	Percentage of correctly classified emails.
+Precision	How many predicted spam emails are actually spam.
+Recall	How many actual spam emails are correctly detected.
+F1 Score	Harmonic mean of precision and recall.
+Confusion Matrix	Shows correct and incorrect predictions.
+ROC Curve	Shows the relationship between True Positive Rate and False Positive Rate.
+AUC	Measures the overall classification performance.
+
+6. Performance Comparison
+- Evaluated both KNN and SVM models.
+- Compared accuracy, precision, recall, and F1 score.
+- Used bar graphs to visualize model performance.
+- Used ROC and Precision-Recall curves for further analysis.
+
+3. Conclusion
+Successfully implemented email spam detection using K-Nearest Neighbors (KNN) and Support Vector Machine (SVM). Classified emails into Spam and Not Spam categories using binary classification. Evaluated and compared both models using accuracy, precision, recall, F1 score, confusion matrix, ROC curve, and Precision-Recall curve.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viva Questions and Answers
+Important viva questions
+No.	Question	One-line Answer
+1	What is classification?	Classification is a machine learning technique used to predict categories or classes.
+2	What is binary classification?	It classifies data into two categories.
+3	What is spam?	Spam is an unwanted or unsolicited email.
+4	What is the target variable?	Prediction is the target variable.
+5	What are the two classes?	0 represents Not Spam and 1 represents Spam.
+6	What is supervised learning?	It learns from labelled training data.
+7	What is KNN?	KNN classifies data based on the majority class of its nearest neighbours.
+8	What does K represent in KNN?	K represents the number of nearest neighbours.
+9	What is K used in this practical?	K = 5.
+10	What is SVM?	SVM is an algorithm that separates classes using an optimal decision boundary.
+11	What is a hyperplane?	A hyperplane is a decision boundary that separates different classes.
+12	What is a kernel in SVM?	A kernel helps SVM separate data by transforming it into another feature space.
+13	Which kernel is used here?	Linear kernel.
+14	What is train-test split?	It divides the dataset into training and testing parts.
+15	What is the test size?	20% of the dataset.
+16	What is accuracy?	It is the ratio of correct predictions to total predictions.
+17	What is precision?	It measures how many predicted positive cases are actually positive.
+18	What is recall?	It measures how many actual positive cases are correctly identified.
+19	What is F1 score?	It is the harmonic mean of precision and recall.
+20	What is a confusion matrix?	It shows correct and incorrect classification results.
+21	What is ROC?	ROC is a curve that plots True Positive Rate against False Positive Rate.
+22	What is AUC?	AUC is the area under the ROC curve.
+23	What is False Positive?	Predicting an email as spam when it is actually not spam.
+24	What is False Negative?	Predicting an email as not spam when it is actually spam.
+25	Which algorithm is distance-based?	KNN.
+26	Which algorithm uses a hyperplane?	SVM.
+27	What is fit()?	It trains the machine learning model.
+28	What is predict()?	It predicts the class of new data.
+29	What is predict_proba()?	It returns the predicted probability for each class.
+30	Which model is better?	The model with better evaluation scores, especially precision, recall, and F1 score, is preferred.
+
+5. Important Code-Based Viva Questions
+Code	Purpose
+pd.read_csv()	Loads the CSV dataset.
+df.head()	Displays the first five rows.
+df.shape	Displays the number of rows and columns.
+df.drop()	Removes unnecessary columns.
+train_test_split()	Splits data into training and testing sets.
+KNeighborsClassifier(n_neighbors=5)	Creates a KNN classifier with 5 neighbours.
+SVC(kernel='linear')	Creates an SVM classifier with a linear kernel.
+accuracy_score()	Calculates accuracy.
+precision_score()	Calculates precision.
+recall_score()	Calculates recall.
+f1_score()	Calculates F1 score.
+confusion_matrix()	Generates a confusion matrix.
+roc_curve()	Calculates ROC curve values.
+auc()	Calculates the area under a curve.
+predict_proba()	Returns class probabilities.
+sns.heatmap()	Displays the confusion matrix graphically.
+plt.plot()	Draws graphs and curves.
+
+6. Important Differences
+KNN	SVM
+K-Nearest Neighbors	Support Vector Machine
+Distance-based algorithm.	Margin-based algorithm.
+Uses nearest neighbours.	Uses an optimal hyperplane.
+Simple to understand.	Comparatively complex.
+Prediction can be slow for large datasets.	Prediction can be efficient after training.
+Sensitive to feature scaling.	Also sensitive to feature scaling.
+
+7. Important Formulas for Viva
+Accuracy
+Accuracy = {TP+TN}/{TP+TN+FP+FN}
+
+Precision
+Precision = frac{TP}/{TP+FP}
+
+Recall
+Recall = {TP}/{TP+FN}
+
+F1 Score
+F1 = 2 * {Precision * Recall/Precision+Recall}

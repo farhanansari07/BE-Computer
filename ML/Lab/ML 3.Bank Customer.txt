@@ -1,0 +1,396 @@
+Given a bank customer, build a neural network-based classifier that can determine whether 
+they will leave or not in the next 6 months. 
+Dataset Description: The case study is from an open-source dataset from Kaggle. 
+The dataset contains 10,000 sample points with 14 distinct features such as 
+CustomerId, CreditScore, Geography, Gender, Age, Tenure, Balance, etc. 
+Link to the Kaggle project: 
+https://www.kaggle.com/barelydedicated/bank-customer-churn-modeling  
+Perform following steps: 
+1. Read the dataset. 
+2. Distinguish the feature and target set and divide the data set into training and test sets. 
+3. Normalize the train and test data.  
+4. Initialize and build the model. Identify the points of improvement and implement the same.  
+5. Print the accuracy score and confusion matrix (5 points).
+
+
+
+!pip install tensorflow
+
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+
+
+
+# Load dataset
+dataset = pd.read_csv("Churn_Modelling.csv")
+
+# Display first 5 rows
+dataset.head()
+
+
+
+
+
+X = dataset.iloc[:, 3:-1].values
+y = dataset.iloc[:, -1].values
+
+print(X.shape)
+print(y.shape)
+
+
+
+
+
+
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+ct = ColumnTransformer(
+    transformers=[('encoder', OneHotEncoder(), [1])],
+    remainder='passthrough'
+)
+
+X = np.array(ct.fit_transform(X))
+
+
+
+
+
+
+le = LabelEncoder()
+X[:,4] = le.fit_transform(X[:,4])
+
+
+
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=0
+)
+
+
+
+
+
+
+sc = StandardScaler()
+
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+
+
+
+
+
+ann = Sequential()
+
+# First Hidden Layer
+ann.add(Dense(units=6, activation='relu'))
+
+# Second Hidden Layer
+ann.add(Dense(units=6, activation='relu'))
+
+# Output Layer
+ann.add(Dense(units=1, activation='sigmoid'))
+
+
+
+
+
+
+ann.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+
+
+
+
+
+
+history = ann.fit(
+    X_train,
+    y_train,
+    batch_size=32,
+    epochs=100,
+    verbose=1
+)
+
+
+
+
+
+
+y_pred = ann.predict(X_test)
+
+y_pred = (y_pred > 0.5)
+
+
+
+
+
+
+
+cm = confusion_matrix(y_test, y_pred)
+
+print("Confusion Matrix:")
+print(cm)
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\nAccuracy Score:", accuracy)
+
+
+
+
+
+
+
+plt.plot(history.history['accuracy'])
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.grid(True)
+plt.show()
+
+
+
+
+
+plt.plot(history.history['loss'])
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.grid(True)
+plt.show()
+
+
+
+
+
+
+
+from tensorflow.keras.layers import Dropout
+
+improved_ann = Sequential()
+
+improved_ann.add(Dense(12, activation='relu'))
+improved_ann.add(Dropout(0.2))
+
+improved_ann.add(Dense(12, activation='relu'))
+improved_ann.add(Dropout(0.2))
+
+improved_ann.add(Dense(1, activation='sigmoid'))
+
+improved_ann.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+history2 = improved_ann.fit(
+    X_train,
+    y_train,
+    batch_size=32,
+    epochs=150,
+    verbose=1
+)
+
+
+
+
+
+
+y_pred2 = improved_ann.predict(X_test)
+y_pred2 = (y_pred2 > 0.5)
+
+cm2 = confusion_matrix(y_test, y_pred2)
+acc2 = accuracy_score(y_test, y_pred2)
+
+print("Improved Model Confusion Matrix:")
+print(cm2)
+
+print("\nImproved Model Accuracy:", acc2)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To build an Artificial Neural Network (ANN)-based binary classification model to predict whether a bank customer will leave the bank (Churn) or stay (Not Churn) within the next six months, and evaluate its performance using accuracy score and confusion matrix.
+2. Theory
+1. Customer Churn Prediction
+
+Customer churn means when a customer stops using the services of a company or bank.
+
+In this practical:
+- 0 – Customer will stay (Not Churn).
+- 1 – Customer will leave (Churn).
+2. Data Preprocessing
+
+Data preprocessing is the process of cleaning and preparing data before applying machine learning algorithms.
+
+In this practical:
+- Loaded the dataset using Pandas.
+- Separated input features (X) and target variable (y).
+- Converted categorical data into numerical format.
+- Divided the dataset into 80% training and 20% testing data.
+3. Label Encoding
+
+Label Encoding converts categorical values into numerical values.
+
+For example:
+- Male = 1
+- Female = 0
+4. One-Hot Encoding
+
+One-Hot Encoding converts categorical values into separate binary columns.
+
+For example, Geography can be converted into:
+- France = 1 or 0
+- Germany = 1 or 0
+- Spain = 1 or 0
+It is used because machine learning models require numerical input.
+
+5. Feature Scaling / Normalization
+
+Feature scaling brings numerical features into a similar range so that large values do not dominate smaller values.
+
+In this practical, StandardScaler is used.
+
+It converts data into a standard scale with approximately:
+- Mean = 0
+- Standard Deviation = 1
+6. Artificial Neural Network (ANN)
+
+ANN is a machine learning model inspired by the human brain. It consists of interconnected neurons arranged in layers.
+
+ANN has three main layers:
+- Input Layer: Receives input features.
+- Hidden Layer: Processes information and learns patterns.
+- Output Layer: Produces the final prediction.
+7. Activation Functions
+
+Activation functions help neural networks learn complex patterns.
+- ReLU: Used in hidden layers.
+- Sigmoid: Used in the output layer to produce a probability between 0 and 1.
+8. Model Compilation
+
+The model is compiled using:
+Parameter	Purpose
+Adam	Optimizer used to update model weights.
+Binary Crossentropy	Loss function used for binary classification.
+Accuracy	Measures correct predictions.
+
+9. Model Training
+- Epochs = 100 for the initial model.
+- Batch size = 32.
+- The model learns patterns from training data over multiple epochs.
+10. Model Improvement
+
+The initial model is improved by:
+- Increasing hidden neurons from 6 to 12.
+- Adding Dropout layers.
+- Increasing epochs from 100 to 150.
+Dropout randomly disables some neurons during training to reduce overfitting.
+
+11. Model Evaluation
+
+The model is evaluated using:
+- Accuracy Score: Measures the percentage of correct predictions.
+- Confusion Matrix: Shows correct and incorrect predictions.
+- Accuracy Graph: Shows model accuracy over epochs.
+- Loss Graph: Shows the model's error during training.
+3. Conclusion
+Successfully implemented an Artificial Neural Network (ANN) to predict bank customer churn. Performed data preprocessing, categorical encoding, feature scaling, model training, and evaluation. Also improved the initial model by increasing hidden neurons and adding Dropout layers to reduce overfitting. Evaluated both models using accuracy score and confusion matrix.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viva Questions and Answers
+Important viva questions
+No.	Question	One-line Answer
+1	What is ANN?	ANN stands for Artificial Neural Network, inspired by the human brain.
+2	What is customer churn?	Customer churn means a customer stops using a company's services.
+3	What is the objective of this practical?	To predict whether a bank customer will leave or stay.
+4	What is binary classification?	It classifies data into two categories.
+5	What are the two output classes?	0 means Not Churn and 1 means Churn.
+6	What is a neuron?	A neuron is the basic processing unit of a neural network.
+7	What are the layers in ANN?	Input layer, hidden layer, and output layer.
+8	What is an input layer?	It receives input features from the dataset.
+9	What is a hidden layer?	It processes input data and learns patterns.
+10	What is an output layer?	It produces the final prediction.
+11	What is an activation function?	It introduces non-linearity into a neural network.
+12	What is ReLU?	ReLU converts negative values into zero and keeps positive values unchanged.
+13	What is Sigmoid?	Sigmoid converts values into a range between 0 and 1.
+14	Why is Sigmoid used in the output layer?	It produces probabilities for binary classification.
+15	What is Label Encoding?	It converts categorical values into numerical labels.
+16	What is One-Hot Encoding?	It converts categories into separate binary columns.
+17	What is StandardScaler?	It standardizes features to have approximately zero mean and unit variance.
+18	What is overfitting?	Overfitting occurs when a model performs well on training data but poorly on unseen data.
+19	What is Dropout?	Dropout randomly disables neurons during training to reduce overfitting.
+20	What is an epoch?	One complete pass through the training dataset.
+21	What is batch size?	Number of training samples processed before updating model weights.
+22	What is an optimizer?	It updates model weights to minimize loss.
+23	What is Adam?	Adam is an optimization algorithm used to train neural networks.
+24	What is loss function?	It measures the difference between actual and predicted values.
+25	What is Binary Crossentropy?	It is a loss function used for binary classification.
+26	What is confusion matrix?	It shows correct and incorrect classification results.
+27	What is accuracy?	It is the percentage of correctly predicted observations.
+28	What is TensorFlow?	TensorFlow is an open-source library used for machine learning and deep learning.
+29	What is Keras?	Keras is a high-level API used to build and train neural networks.
+30	What is the difference between AI and ML?	AI is the broader concept of machine intelligence, while ML is a subset of AI.
+
+5. Important Code-Based Viva Questions
+Code	Purpose
+pd.read_csv()	Loads the dataset.
+dataset.iloc[:, 3:-1]	Selects input features, excluding the first three columns and the last column.
+dataset.iloc[:, -1]	Selects the last column as the target.
+OneHotEncoder()	Converts categorical data into binary columns.
+LabelEncoder()	Converts categorical labels into numerical values.
+train_test_split()	Divides data into training and testing sets.
+StandardScaler()	Standardizes the features.
+Sequential()	Creates a sequential neural network model.
+Dense()	Creates a fully connected neural network layer.
+activation='relu'	Applies ReLU activation.
+activation='sigmoid'	Produces output between 0 and 1.
+ann.compile()	Configures the model for training.
+optimizer='adam'	Uses Adam optimizer.
+loss='binary_crossentropy'	Sets binary classification loss.
+ann.fit()	Trains the neural network.
+ann.predict()	Predicts customer churn probabilities.
+y_pred > 0.5	Converts probabilities into binary classes.
+confusion_matrix()	Generates the confusion matrix.
+accuracy_score()	Calculates prediction accuracy.
+Dropout(0.2)	Randomly disables 20% of neurons during training.
+
+6. Important Differences
+ANN	Traditional ML
+Inspired by the human brain.	Based on mathematical algorithms.
+Uses interconnected neurons.	Uses algorithms like KNN, SVM and Regression.
+Can learn complex patterns.	Performance depends on the algorithm.
+Usually requires more training resources.	Often requires fewer resources.
+
+7. Important Formulas for Viva
+Sigmoid Activation Function
+f(x)={1}/{1+e^{-x}}
+
+ReLU Activation Function
+f(x)=max(0,x)
+
+Accuracy
+Accuracy={TP+TN}/{TP+TN+FP+FN}

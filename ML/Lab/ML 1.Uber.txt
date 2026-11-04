@@ -1,0 +1,264 @@
+Predict the price of the Uber ride from a given pickup point to the agreed drop-off location. 
+Perform following tasks: 
+1.  Pre-process the dataset. 
+2.  Identify outliers. 
+3.  Check the correlation. 
+4.  Implement linear regression and random forest regression models. 
+5.  Evaluate the models and compare their respective scores like R2, RMSE, etc. 
+Dataset link: https://www.kaggle.com/datasets/yasserh/uber-fares-dataset 
+
+
+
+#swaraj
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+
+
+
+df = pd.read_csv('uber.csv')
+print("Dataset head:")
+print(df.head())
+
+
+
+
+print("\nMissingvaluespercolumn:")
+print(df.isnull().sum())
+
+
+
+#Droprows with missingvaluesifany
+df =df.dropna()
+#Feature engineering:Convertdatetimetousefulfeatures
+df['pickup_datetime'] = pd.to_datetime(df['pickup_datetime'])
+df['hour'] = df['pickup_datetime'].dt.hour
+df['dayofweek']= df['pickup_datetime'].dt.dayofweek
+
+
+
+#Calculate haversinedistancebetweenpickupanddropoff
+def haversine(lat1,lon1,lat2,lon2):
+# convertdecimaldegreestoradians
+    lat1, lon1, lat2,lon2= map(np.radians, [lat1, lon1, lat2, lon2])
+    dlat= lat2-lat1
+    dlon= lon2-lon1
+    a =np.sin(dlat/2)**2+ np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2
+    c =2 *np.arcsin(np.sqrt(a))
+    r =6371 #Radiusofearthinkilometers
+    return c * r
+df['distance_km'] = haversine(df['pickup_latitude'], df['pickup_longitude'],
+df['dropoff_latitude'], df['dropoff_longitude'])
+
+
+
+
+ # Remove entries with zero or near-zero distance or fare (likely errors)
+df = df[(df['distance_km'] > 0.01) & (df['fare_amount'] > 0)]
+print(f"\nData shape after cleaning: {df.shape}")
+
+
+
+
+
+# 3. Outlier detection- visualize fare and distance
+plt.figure(figsize=(12,5))
+
+plt.subplot(1,2,1)
+sns.boxplot(x=df['fare_amount'])
+plt.title("Fare Amount Distribution")
+
+plt.subplot(1,2,2)
+sns.boxplot(x=df['distance_km'])
+plt.title("Distance Distribution (km)")
+
+plt.show()
+
+fare_99 = df['fare_amount'].quantile(0.99)
+dist_99 = df['distance_km'].quantile(0.99)
+
+df = df[(df['fare_amount'] <= fare_99) & (df['distance_km'] <= dist_99)]
+print(f"\nData shape after removing outliers: {df.shape}")
+
+
+
+
+
+# 4. Correlation heatmap
+plt.figure(figsize=(8,6))
+sns.heatmap(df[['fare_amount', 'distance_km', 'hour', 'dayofweek']].corr(),
+    annot=True, cmap='coolwarm')
+plt.title("Feature Correlation")
+plt.show()
+
+
+
+
+
+
+# 5. Model preparation
+features = ['distance_km', 'hour', 'dayofweek']
+X = df[features]
+y = df['fare_amount']
+
+
+
+
+ # Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+    random_state=42)
+# 6. Linear Regression model
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+
+
+
+
+ # 7. Random Forest Regression model
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+y_pred_rf = rf.predict(X_test)
+
+
+
+
+# 8. Evaluation function
+def evaluate(y_true, y_pred, model_name):
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    r2 = r2_score(y_true, y_pred)
+    print(f"{model_name}- RMSE: {rmse:.2f}, R2: {r2:.4f}")
+evaluate(y_test, y_pred_lr, "Linear Regression")
+evaluate(y_test, y_pred_rf, "Random Forest")
+
+
+
+ # 9. Visualize predictions vs actual for Random Forest (best model expected)
+plt.figure(figsize=(8,6))
+plt.scatter(y_test, y_pred_rf, alpha=0.3)
+plt.xlabel("Actual Fare")
+plt.ylabel("Predicted Fare")
+plt.title("Random Forest Regression: Actual vs Predicted Fare")
+plt.plot([0, y_test.max()], [0, y_test.max()], 'r--') # diagonal line
+plt.show()
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Aim
+To predict Uber ride fare prices based on pickup and drop-off locations using Linear Regression and Random Forest Regression by performing data preprocessing, outlier detection, correlation analysis, and model evaluation.
+2. Theory
+1. Data Preprocessing
+
+Data preprocessing is the process of cleaning and preparing raw data before applying machine learning algorithms.
+
+In this practical:
+- Loaded the Uber dataset using Pandas.
+- Checked and removed missing values using dropna().
+- Converted pickup datetime into useful features like hour and day of the week.
+- Removed invalid fare and distance values.
+2. Feature Engineering
+
+Feature engineering means creating new useful features from existing data.
+
+In this practical:
+- Extracted hour and dayofweek from pickup datetime.
+- Calculated distance between pickup and drop-off locations using the Haversine formula.
+3. Outlier Detection
+
+Outliers are unusual values that are very different from other values in a dataset.
+- Used boxplots to identify outliers in fare and distance.
+- Used the 99th percentile to remove extreme values.
+4. Correlation Analysis
+
+Correlation measures the relationship between two variables.
+- Used a correlation heatmap to understand relationships between fare, distance, hour, and day of the week.
+- Distance generally has a positive correlation with fare.
+5. Linear Regression
+
+Linear Regression is a supervised machine learning algorithm used to predict continuous numerical values.
+
+It finds the relationship between input features and the target variable using a linear equation.
+
+6. Random Forest Regression
+
+Random Forest Regression is an ensemble learning algorithm that uses multiple decision trees to make predictions.
+
+It combines predictions from different trees to improve accuracy and reduce overfitting.
+
+7. Model Evaluation
+
+The models are evaluated using:
+Metric	Meaning
+R² Score	Measures how well the model explains the data. Higher is better.
+RMSE	Measures the average prediction error. Lower is better.
+MSE	Measures the average squared prediction error. Lower is better.
+
+Features used:
+- Distance in kilometres
+- Pickup hour
+- Day of the week
+Target variable: fare_amount
+3. Conclusion
+Successfully implemented Uber fare price prediction using Linear Regression and Random Forest Regression. Performed data preprocessing, feature engineering, outlier detection, and correlation analysis. Evaluated both models using R² score and RMSE and compared their performance. Random Forest is generally expected to perform better because it can capture nonlinear relationships in the data.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viva Questions and Answers
+Important for practical viva
+No.	Question	One-line Answer
+1	What is Machine Learning?	Machine Learning enables computers to learn from data and make predictions.
+2	What is Regression?	Regression is used to predict continuous numerical values.
+3	What is Linear Regression?	It predicts values using a linear relationship between input and output variables.
+4	What is Random Forest?	It is an ensemble algorithm that combines multiple decision trees.
+5	What is the target variable?	fare_amount is the target variable.
+6	What are features?	Features are input variables used to make predictions.
+7	What is preprocessing?	It is the process of cleaning and preparing raw data.
+8	What is a missing value?	A missing value is a data entry that is not available.
+9	What is an outlier?	An outlier is a value that differs significantly from other observations.
+10	What is a boxplot?	A boxplot is used to visualize data distribution and detect outliers.
+11	What is correlation?	Correlation measures the relationship between two variables.
+12	What is a heatmap?	A heatmap represents data values using different colours.
+13	What is feature engineering?	It is the process of creating useful features from existing data.
+14	What is the Haversine formula?	It calculates the geographical distance between two points on Earth.
+15	What is the radius of Earth used in this code?	6371 kilometres.
+16	What is Pandas?	Pandas is a Python library used for data manipulation and analysis.
+17	What is NumPy?	NumPy is a Python library used for numerical calculations.
+18	What is Scikit-learn?	It is a Python library used for machine learning.
+19	What is train-test split?	It divides the dataset into training and testing data.
+20	What is the test size used here?	20% of the dataset.
+21	What is random_state=42?	It ensures reproducible random splitting of data.
+22	What is fit()?	It trains the machine learning model.
+23	What is predict()?	It generates predictions using a trained model.
+24	What is R² score?	It measures how well the model explains variations in the target variable.
+25	What is RMSE?	It measures prediction error in the same unit as the target variable.
+26	Which model is expected to perform better?	Random Forest generally performs better on nonlinear data.
+27	What is an ensemble algorithm?	It combines multiple models to produce a better prediction.
+28	What is n_estimators=100?	It specifies that the Random Forest will use 100 decision trees.
+29	What is supervised learning?	It learns from labelled data containing inputs and known outputs.
+30	What is the difference between classification and regression?	Classification predicts categories, while regression predicts numerical values.
+
+5. Important code-based viva questions
+These are particularly useful because examiners often ask directly from your code.
+Code	Purpose
+pd.read_csv()	Reads the CSV dataset.
+df.head()	Displays the first five rows.
+df.isnull().sum()	Counts missing values in each column.
+df.dropna()	Removes rows containing missing values.
+pd.to_datetime()	Converts data into datetime format.
+.dt.hour	Extracts the pickup hour.
+.dt.dayofweek	Extracts the day of the week (Monday = 0).
+np.radians()	Converts degrees into radians.
+quantile(0.99)	Calculates the 99th percentile.
+train_test_split()	Splits data into training and testing sets.
+LinearRegression()	Creates a Linear Regression model.
+RandomForestRegressor()	Creates a Random Forest Regression model.
+mean_squared_error()	Calculates Mean Squared Error.
+r2_score()	Calculates the R² score.
+plt.scatter()	Creates a scatter plot.
